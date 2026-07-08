@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <!-- 深色科技感背景渐变 -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f0c29"/>
+      <stop offset="50%" stop-color="#302b63"/>
+      <stop offset="100%" stop-color="#24243e"/>
+    </linearGradient>
+    <!-- 变形线条的霓虹渐变 -->
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d2ff"/>
+      <stop offset="100%" stop-color="#7a00ff"/>
+    </linearGradient>
+    <!-- 控制点发光效果 -->
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="30%" stop-color="#7a00ff"/>
+      <stop offset="100%" stop-color="#7a00ff" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 缩小后的箭头标记 -->
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="0" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#00d2ff" />
+    </marker>
+  </defs>
+
+  <!-- 图标容器背景，带圆角 -->
+  <rect width="120" height="120" rx="16" fill="url(#bg)"/>
+
+  <!-- 原始规则网格 (灰色虚线，作为参照) -->
+  <g stroke="#4a4a6a" stroke-width="1.2" stroke-dasharray="3,3" fill="none">
+    <line x1="25" y1="40" x2="75" y2="20"/>
+    <line x1="25" y1="60" x2="75" y2="40"/>
+    <line x1="25" y1="80" x2="75" y2="60"/>
+    <line x1="25" y1="40" x2="25" y2="80"/>
+    <line x1="50" y1="30" x2="50" y2="70"/>
+    <line x1="75" y1="20" x2="75" y2="60"/>
+  </g>
+
+  <!-- 变形后的网格 (亮色实线) -->
+  <g stroke="url(#accent)" stroke-width="2" stroke-linecap="round" fill="none">
+    <path d="M25,40 L50,30 L75,20" />
+    <path d="M25,80 L50,70 L75,60" />
+    <!-- 中间一行因控制点拖拽而产生的曲线变形 -->
+    <path d="M25,60 Q55,64 68,62 Q78,58 75,40" />
+    <!-- 中间一列因控制点拖拽而产生的曲线 -->
+    <path d="M50,30 Q55,45 68,62" />
+    <path d="M68,62 Q55,70 50,70" />
+    <!-- 左右两侧未变形的竖直线 -->
+    <path d="M25,40 L25,60 L25,80" />
+    <path d="M75,20 L75,40 L75,60" />
+  </g>
+
+  <!-- 原始控制点 (半透明紫点) -->
+  <g fill="#a288c9" opacity="0.6">
+    <circle cx="25" cy="40" r="2.5"/>
+    <circle cx="50" cy="30" r="2.5"/>
+    <circle cx="75" cy="20" r="2.5"/>
+    <circle cx="25" cy="60" r="2.5"/>
+    <circle cx="75" cy="40" r="2.5"/>
+    <circle cx="25" cy="80" r="2.5"/>
+    <circle cx="50" cy="70" r="2.5"/>
+    <circle cx="75" cy="60" r="2.5"/>
+  </g>
+
+  <!-- 被拖拽的中心控制点 (高亮，带发光效果) -->
+  <circle cx="68" cy="62" r="8" fill="url(#glow)" opacity="0.8"/>
+  <circle cx="68" cy="62" r="4.5" fill="#ffffff" stroke="#7a00ff" stroke-width="2"/>
+
+  <!-- 缩小后的变形方向指示箭头 -->
+  <line x1="68" y1="62" x2="82" y2="74" stroke="#00d2ff" stroke-width="2" marker-end="url(#arrow)" />
+</svg>

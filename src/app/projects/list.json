@@ -1,0 +1,13 @@
+[
+	{
+		"name": "三维 FFD 变形",
+		"year": 2025,
+		"image": "images/project/3D_FFD.svg",
+		"url": "https://pease698.github.io/CA_FFD/",
+		"description": "使用 React 和 Three.js 实现的三维 FFD 变形原理演示",
+		"tags": [
+			"FFD",
+			"React"
+		]
+	}
+]
