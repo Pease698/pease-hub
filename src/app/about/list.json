@@ -1,5 +1,5 @@
 {
 	"title": "关于本站",
-	"description": "",
-	"content": ""
+	"description": "Pease 的个人博客",
+	"content": "这里是 Pease 的个人博客，记录代码学习和各种有趣的事情。\n\n网站基于开源项目 [2025-blog-public](https://github.com/YYsuni/2025-blog-public) 构建，部署于 Cloudflare Workers。所有内容通过 GitHub 仓库管理，支持前端可视化编辑。"
 }
