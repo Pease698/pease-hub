@@ -7,6 +7,10 @@ compatibility_flags = ["nodejs_compat"]
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+[[kv_namespaces]]
+binding = "LIKES"
+id = "34f2d061ccb5400ea4c17aa5dac8ce95"
+
 [build]
 command = "pnpm run build:cf"
 
