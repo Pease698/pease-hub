@@ -160,8 +160,8 @@ $$f(n) = g(n) + h(n)$$
 > [!note] 损失函数
 > 常用的损失函数包括：
 > 1. **均方误差 (MSE - Mean Squared Error)**
-> 	   - **原理**：预测值与真实值差值的平方和的平均数。公式为 $\text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2$
-> 	   - **适用**：回归任务（如预测温度、价格）
+> 	  - **原理**：预测值与真实值差值的平方和的平均数。公式为 $\text{MSE} = \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i)^2$
+> 	  - **适用**：回归任务（如预测温度、价格）
 > 2. **交叉熵损失 (Cross-Entropy Loss)**
 >     - **原理**：衡量两个概率分布之间的差异。预测的概率分布越接近真实的标签分布（通常是 One-hot 编码），交叉熵越小
 >     - **适用**：分类任务（如图像识别、文本分类）。它在梯度计算时能有效避免 Sigmoid 等激活函数的梯度消失问题
@@ -272,17 +272,18 @@ $$\frac{\partial L}{\partial z_i} = \hat{y}_i - y_i$$
 
 ### 多层感知机 (Multilayer Perceptron, MLP)
 
-多层感知机是最基础的深度神经网络架构，通常也被称为全连接神经网络 (Fully Connected Neural Network)
+多层感知机是最基础的深度神经网络架构，通常也被称为全连接神经网络 (Fully Connected Neural Network)，它在输入层和输出层之间，加入了一个或多个**隐藏层 (Hidden Layers)**。每一层的每一个神经元都与上一层的所有神经元相连（这就是全连接的由来）
 
-- **核心结构**：在输入层和输出层之间，加入了一个或多个**隐藏层 (Hidden Layers)**。每一层的每一个神经元都与上一层的所有神经元相连（这就是全连接的由来）
-- **数学本质**：如果网络只有一个隐藏层，它的前向传播可以表示为一系列矩阵运算的组合：
-    $$
-	\begin{aligned}
-    \mathbf{h} &= \sigma(\mathbf{W}^{(1)}\mathbf{x} + \mathbf{b}^{(1)})\\
-    \mathbf{y} &= \mathbf{W}^{(2)}\mathbf{h} + \mathbf{b}^{(2)}
-	\end{aligned}
-    $$
-    其中 $\mathbf{x}$ 是输入，$\mathbf{W}$ 和 $\mathbf{b}$ 是权重和偏置，$\sigma$ 是激活函数，$\mathbf{h}$ 是隐藏层输出，$\mathbf{y}$ 是最终预测结果
+如果网络只有一个隐藏层，它的前向传播可以表示为一系列矩阵运算的组合：
+
+$$
+\begin{aligned}
+\mathbf{h} &= \sigma(\mathbf{W}^{(1)}\mathbf{x} + \mathbf{b}^{(1)})\\
+\mathbf{y} &= \mathbf{W}^{(2)}\mathbf{h} + \mathbf{b}^{(2)}
+\end{aligned}
+$$
+
+其中 $\mathbf{x}$ 是输入，$\mathbf{W}$ 和 $\mathbf{b}$ 是权重和偏置，$\sigma$ 是激活函数，$\mathbf{h}$ 是隐藏层输出，$\mathbf{y}$ 是最终预测结果
 
 > [!tip] 隐藏层
 > 简单的线性模型（如逻辑回归）只能解决线性可分的问题。引入隐藏层后，网络在理论上被证明具备**通用近似定理 (Universal Approximation Theorem)**，即只要隐藏层足够宽，MLP 可以拟合任何复杂的连续函数
@@ -293,16 +294,16 @@ $$\frac{\partial L}{\partial z_i} = \hat{y}_i - y_i$$
 > 常见的激活函数包括：
 > 1. **Sigmoid 函数**：
 >     将任意实数映射到 $(0, 1)$ 区间，早期常用于输出概率
->     $$f(x) = \frac{1}{1 + e^{-x}}$$
+> $$f(x) = \frac{1}{1 + e^{-x}}$$
 > 2. **Tanh (双曲正切) 函数**：
 >     将任意实数映射到 $(-1, 1)$ 区间。它的均值为 0，在优化时比 Sigmoid 更容易收敛
->     $$f(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$$
+> $$f(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$$
 > 3. **ReLU (Rectified Linear Unit) 函数**：
 >     现代深度学习的基石。保留正数，将负数置零。计算极快，且有效缓解了梯度消失
->     $$f(x) = \max(0, x)$$
+> $$f(x) = \max(0, x)$$
 > 4. **Leaky ReLU 函数**：
 >     为了解决 ReLU 中负数部分梯度完全为零（神经元坏死）的问题，赋予负半轴一个极小的斜率（如 $\alpha = 0.01$）
->     $$f(x) = \max(\alpha x, x)$$
+> $$f(x) = \max(\alpha x, x)$$
 
 > [!tip] 权重初始化
 > 如果将网络所有权重初始化为 0，反向传播时所有神经元的梯度都一样，网络失去了打破对称性的能力。随机初始化是必须的，但随机的方差极大影响了前向传播的方差和反向传播的梯度稳定性
@@ -577,9 +578,13 @@ $$\begin{bmatrix} 4 & 6 & 0 & 7 & 9 & 0 & 0 & 0 & 0 \\ 0 & 4 & 6 & 0 & 7 & 9 & 0
     2. **输出计算**：$y_t = W_{yh} h_t + b_y$
 - **反向传播 (BPTT, Backpropagation Through Time)**：
     RNN 的反向传播需要把网络在时间轴上“展开（Unroll）”。当我们计算损失函数 $L$ 对权重矩阵 $W_{hh}$ 的梯度时，必须对所有时间步的梯度求和：
-    $$\frac{\partial L}{\partial W_{hh}} = \sum_{t=1}^T \frac{\partial L_t}{\partial W_{hh}}$$
+
+    $\frac{\partial L}{\partial W_{hh}} = \sum_{t=1}^T \frac{\partial L_t}{\partial W_{hh}}$
+
     而要算 $\frac{\partial L_t}{\partial W_{hh}}$，必须利用链式法则一直追溯到初始时刻：
-    $$\frac{\partial L_t}{\partial W_{hh}} = \frac{\partial L_t}{\partial y_t} \frac{\partial y_t}{\partial h_t} \sum_{k=1}^t \frac{\partial h_t}{\partial h_k} \frac{\partial h_k}{\partial W_{hh}}$$
+
+    $\frac{\partial L_t}{\partial W_{hh}} = \frac{\partial L_t}{\partial y_t} \frac{\partial y_t}{\partial h_t} \sum_{k=1}^t \frac{\partial h_t}{\partial h_k} \frac{\partial h_k}{\partial W_{hh}}$
+
     核心难点就在于这个**跨越时间的偏导数连乘** $\frac{\partial h_t}{\partial h_k}$，容易发生梯度消失或梯度爆炸
 
 > [!tip] 梯度消失/爆炸
@@ -617,9 +622,12 @@ $$\begin{bmatrix} 4 & 6 & 0 & 7 & 9 & 0 & 0 & 0 & 0 \\ 0 & 4 & 6 & 0 & 7 & 9 & 0
 **1. 计算注意力得分（相似度）**
 
 得分函数 $f$ 有多种选择，最常见的是**点积**和**缩放点积**：
+
 $$
 score(q, k_i) = q \cdot k_i \quad \text{或} \quad \frac{q \cdot k_i}{\sqrt{d_k}}
-$$其中 $d_k$ 是 Key 向量的维度。除以 $\sqrt{d_k}$ 是为了防止点积值过大，导致 softmax 梯度过小而难以训练
+$$
+
+其中 $d_k$ 是 Key 向量的维度。除以 $\sqrt{d_k}$ 是为了防止点积值过大，导致 softmax 梯度过小而难以训练
 
 **2. 归一化为概率分布（注意力权重）**
 
@@ -655,7 +663,11 @@ $$
 1. **交叉注意力 (Cross-Attention)**：常用于 Encoder-Decoder 架构（如机器翻译）。模型一边看着源语言（提供 Key 和 Value），一边生成目标语言（提供 Query）
 2. **自注意力 (Self-Attention)**：它完全发生在序列内部，序列自己既是查询者，又是被查询者
 3. **因果注意力 (Causal/Masked Attention)**：用于 GPT 等 Decoder-only 模型。在预测下一个词时，强制屏蔽（Mask）掉未来的词，只允许看到当前和过去的词
-4. **多头注意力 (Multi-Head Attention)**：这是对以上机制的增强。将 $Q, K, V$ 用 $h$ 组不同的投影矩阵并行映射到较小的子空间，分别计算注意力，最后将输出拼接： $$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \dots, \text{head}_h) W^O$$每个“头”可以学习关注不同的模式（比如一个头专注位置，一个头专注语义），使模型容量和表达能力大幅提升
+4. **多头注意力 (Multi-Head Attention)**：这是对以上机制的增强。将 $Q, K, V$ 用 $h$ 组不同的投影矩阵并行映射到较小的子空间，分别计算注意力，最后将输出拼接： 
+
+    $\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \dots, \text{head}_h) W^O$
+
+    每个“头”可以学习关注不同的模式（比如一个头专注位置，一个头专注语义），使模型容量和表达能力大幅提升
 
 > [!note] 自注意力机制
 > 在 Self-Attention 中，序列的输入特征矩阵 $X$ 会分别乘以三个独立的可学习权重矩阵（$W_Q, W_K, W_V$），在**同一个数据源**上投影出三个不同的分身：
