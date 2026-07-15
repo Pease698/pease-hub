@@ -30,7 +30,7 @@
 }
 .prose h3 {
 	font-size: 1rem;
-	font-weight: 700;
+	font-weight: 600;
 
 	&::before {
 		content: '## ';
@@ -39,7 +39,7 @@
 }
 .prose h4 {
 	font-size: 0.85rem;
-	font-weight: 500;
+	font-weight: 600;
 	&::before {
 		content: '### ';
 		@apply text-brand/60;
@@ -47,7 +47,7 @@
 }
 .prose h5 {
 	font-size: 0.75rem;
-	font-weight: 500;
+	font-weight: 600;
 	&::before {
 		content: '#### ';
 		@apply text-brand/60;

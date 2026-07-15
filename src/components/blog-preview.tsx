@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { INIT_DELAY } from '@/consts'
 import { useMarkdownRender } from '@/hooks/use-markdown-render'
 import { useSize } from '@/hooks/use-size'
+import { getReadingStats } from '@/lib/utils'
 import { BlogSidebar } from '@/components/blog-sidebar'
 import { useConfigStore } from '@/app/(home)/stores/config-store'
 
@@ -22,6 +23,7 @@ export function BlogPreview({ markdown, title, tags, date, summary, cover, slug 
 	const { content, toc, loading } = useMarkdownRender(markdown)
 	const { siteContent } = useConfigStore()
 	const summaryInContent = siteContent.summaryInContent ?? false
+	const stats = getReadingStats(markdown)
 
 	if (loading) {
 		return <div className='text-secondary flex h-full items-center justify-center text-sm'>渲染中...</div>
@@ -44,6 +46,10 @@ export function BlogPreview({ markdown, title, tags, date, summary, cover, slug 
 					</div>
 
 					<div className='text-secondary mt-3 text-center text-sm'>{date}</div>
+
+					<div className='text-secondary mt-2 text-center text-sm'>
+						本文总计 {stats.chars} 字 | 预计阅读时间 {stats.minutes} min
+					</div>
 
 					{summary && summaryInContent && <div className='text-secondary mt-6 cursor-text text-center text-sm'>“{summary}”</div>}
 

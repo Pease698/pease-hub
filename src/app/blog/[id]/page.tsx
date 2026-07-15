@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation'
 import dayjs from 'dayjs'
 import { motion } from 'motion/react'
 import { BlogPreview } from '@/components/blog-preview'
+import { ScrollBar } from '@/components/scroll-bar'
 import { loadBlog, type BlogConfig } from '@/lib/load-blog'
 import { useReadArticles } from '@/hooks/use-read-articles'
 import LiquidGrass from '@/components/liquid-grass'
@@ -70,6 +71,7 @@ export default function Page() {
 
 	return (
 		<>
+			<ScrollBar />
 			<BlogPreview
 				markdown={blog.markdown}
 				title={title}

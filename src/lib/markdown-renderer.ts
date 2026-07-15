@@ -89,18 +89,18 @@ function convertCallouts(html: string): string {
 
 				const typeClass = type.toLowerCase()
 				const firstNewline = titleContent.indexOf('\n')
-					const actualTitle = firstNewline === -1
-						? titleContent.trim()
-						: titleContent.substring(0, firstNewline).trim()
-					const displayTitle = actualTitle || config.label
+				const actualTitle = firstNewline === -1
+					? titleContent.trim()
+					: titleContent.substring(0, firstNewline).trim()
+				const displayTitle = actualTitle || config.label
 
-					// Move overflow from the first <p> back into the body
-					const firstParaRest = firstNewline === -1
-						? ''
-						: titleContent.substring(firstNewline + 1).trim()
-					const fullBody = firstParaRest
-						? `<p>${firstParaRest}</p>${body}`
-						: body
+				// Move overflow from the first <p> back into the body
+				const firstParaRest = firstNewline === -1
+					? ''
+					: titleContent.substring(firstNewline + 1).trim()
+				const fullBody = firstParaRest
+					? `<p>${firstParaRest}</p>${body}`
+					: body
 
 				if (collapse) {
 					const openAttr = collapse === '+' ? ' open' : ''

@@ -270,9 +270,9 @@ $$\frac{\partial L}{\partial z_i} = \hat{y}_i - y_i$$
 
 ## 多层感知机与表示学习
 
-### 多层感知机 (Multilayer Perceptron, MLP)
+### 多层感知机
 
-多层感知机是最基础的深度神经网络架构，通常也被称为全连接神经网络 (Fully Connected Neural Network)，它在输入层和输出层之间，加入了一个或多个**隐藏层 (Hidden Layers)**。每一层的每一个神经元都与上一层的所有神经元相连（这就是全连接的由来）
+**多层感知机(Multilayer Perceptron, MLP)** 是最基础的深度神经网络架构，通常也被称为全连接神经网络 (Fully Connected Neural Network)，它在输入层和输出层之间，加入了一个或多个**隐藏层 (Hidden Layers)**。每一层的每一个神经元都与上一层的所有神经元相连（这就是全连接的由来）
 
 如果网络只有一个隐藏层，它的前向传播可以表示为一系列矩阵运算的组合：
 
@@ -1004,7 +1004,7 @@ $$
 
 Decoder-only 架构中删除了 Encoder 部分，同时将 Decoder block 中的交叉注意力层删除。
 
-- 原始 Decoder 块结构 = `掩码自注意力层` + **`交叉注意力层 (Cross-Attention)`** + `前馈神经网络 (FFN)`。
+- 原始 Decoder 块结构 = `掩码自注意力层` + `交叉注意力层 (Cross-Attention)` + `前馈神经网络 (FFN)`。
 - 现代纯 Decoder 块结构 = `掩码自注意力层` + `前馈神经网络 (FFN)`。
 - 当系统剔除 Encoder 时，Decoder 内部负责接收 Encoder 信号的交叉注意力层也被全部删除，这表示在相同的总体参数量预算下模型可以堆叠出更深的纯 Decoder 网络（例如将 12 层 Enc + 12 层原始 Dec，等价转换为约 28 层纯 Dec）
 

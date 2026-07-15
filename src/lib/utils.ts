@@ -34,3 +34,26 @@ export function getFileExt(filename: string): string {
 export function rand(a: number, b: number) {
 	return a + Math.random() * (b - a)
 }
+
+export function getReadingStats(markdown: string): { chars: number; minutes: number } {
+	const plain = markdown
+		.replace(/```[\s\S]*?```/g, '')        // fenced code blocks
+		.replace(/`[^`]*`/g, '')               // inline code
+		.replace(/\$\$[\s\S]*?\$\$/g, '')      // block math
+		.replace(/\$[^$\n]+?\$/g, '')          // inline math
+		.replace(/!\[.*?\]\(.*?\)/g, '')       // images
+		.replace(/\[([^\]]*)\]\(.*?\)/g, '$1') // links → keep text
+		.replace(/[*~>#|]/g, '')               // bold/italic/strikethrough/blockquote/headings/tables
+		.replace(/^[-*+]\s/gm, '')             // unordered list markers
+		.replace(/^\d+\.\s/gm, '')             // ordered list markers
+		.replace(/\n+/g, ' ')                  // newlines → space
+
+	const cjk = (plain.match(/[一-鿿㐀-䶿]/g) || []).length
+	const nonCjk = plain.replace(/[一-鿿㐀-䶿]/g, ' ')
+	const engWords = nonCjk.split(/\s+/).filter(w => w.length > 0).length
+
+	const chars = cjk + engWords
+	const minutes = Math.max(1, Math.ceil(chars / 250))
+
+	return { chars, minutes }
+}
