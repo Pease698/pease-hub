@@ -1,18 +1,31 @@
 [
   {
-    "slug": "deeplearning-note-fundamentals",
-    "title": "深度学习基础知识",
+    "slug": "deeplearning-note-fundamentals-1",
+    "title": "深度学习基础知识-上",
     "tags": [
       "深度学习",
       "MLP",
       "CNN",
+      "笔记"
+    ],
+    "date": "2026-07-15T23:19",
+    "summary": "暑假开始努力补齐深度学习领域的知识，笔记上半部分包括线性回归、MLP、CNN 等的基础内容，后续会有更多学习笔记。",
+    "cover": "/blogs/deeplearning-note-fundamentals-1/im2col.png",
+    "hidden": false,
+    "category": "笔记"
+  },
+  {
+    "slug": "deeplearning-note-fundamentals-2",
+    "title": "深度学习基础知识-下",
+    "tags": [
+      "深度学习",
       "RNN",
       "Transformer",
       "笔记"
     ],
-    "date": "2026-07-15T18:12",
-    "summary": "暑假开始努力补齐深度学习领域的知识，这份笔记包括 MLP、CNN、RNN、Transformer 架构的基础内容，后续会有更多学习笔记。",
-    "cover": "/blogs/deeplearning-note-fundamentals/TransformerArch.png",
+    "date": "2026-07-15T23:21",
+    "summary": "笔记下半部分包括 RNN、Transformer 架构等的基础内容，后续会有更多学习笔记。",
+    "cover": "/blogs/deeplearning-note-fundamentals-2/TransformerArch.png",
     "hidden": false,
     "category": "笔记"
   }

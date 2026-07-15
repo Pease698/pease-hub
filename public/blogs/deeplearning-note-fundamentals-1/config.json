@@ -1,0 +1,12 @@
+{
+  "title": "深度学习基础知识-上",
+  "tags": [
+    "深度学习",
+    "MLP",
+    "CNN",
+    "笔记"
+  ],
+  "date": "2026-07-15T23:19",
+  "summary": "暑假开始努力补齐深度学习领域的知识，笔记上半部分包括线性回归、MLP、CNN 等的基础内容，后续会有更多学习笔记。",
+  "cover": "/blogs/deeplearning-note-fundamentals-1/im2col.png"
+}

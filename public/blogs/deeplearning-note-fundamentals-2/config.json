@@ -1,0 +1,12 @@
+{
+  "title": "深度学习基础知识-下",
+  "tags": [
+    "深度学习",
+    "RNN",
+    "Transformer",
+    "笔记"
+  ],
+  "date": "2026-07-15T23:21",
+  "summary": "笔记下半部分包括 RNN、Transformer 架构等的基础内容，后续会有更多学习笔记。",
+  "cover": "/blogs/deeplearning-note-fundamentals-2/TransformerArch.png"
+}
