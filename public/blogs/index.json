@@ -1,5 +1,19 @@
 [
   {
-    
+    "slug": "deeplearning-note-fundamentals",
+    "title": "深度学习基础知识",
+    "tags": [
+      "深度学习",
+      "MLP",
+      "CNN",
+      "RNN",
+      "Transformer",
+      "笔记"
+    ],
+    "date": "2026-07-15T18:12",
+    "summary": "暑假开始努力补齐深度学习领域的知识，这份笔记包括 MLP、CNN、RNN、Transformer 架构的基础内容，后续会有更多学习笔记。",
+    "cover": "/blogs/deeplearning-note-fundamentals/TransformerArch.png",
+    "hidden": false,
+    "category": "笔记"
   }
 ]
