@@ -96,6 +96,123 @@ type BlogIndexItem = {
 
 由前端编辑器自动维护，新增分类时自动追加。
 
+## 附加内容（Extras）
+
+附加内容允许将博客文章中的长段推导、详细说明、交互式演示等放到独立页面中，保持主文章简洁。访问路径为 `/blog/{slug}/{extra-name}`。
+
+附加内容分为两种类型：
+
+| 类型 | 存放位置 | 用途 | 示例 |
+|------|---------|------|------|
+| Markdown 附加文章 | `public/blogs/{slug}/extras/{name}.md` | 数学推导、详细注释等文字内容 | `detailed-math.md` |
+| React 组件 | `src/components/extras/{name}.tsx` | Three.js 3D 场景等交互式内容 | `three-demo.tsx` |
+
+### 目录结构
+
+```
+public/blogs/文章slug/
+├── config.json          ← 在此配置附加文章标题
+├── index.md             ← 主文章
+├── *.png                ← 图片
+└── extras/              ← 附加文章目录
+    └── 附加名.md         ← Markdown 附加内容
+
+src/
+├── app/blog/[id]/[...extra]/
+│   ├── page.tsx          ← 附加内容路由
+│   └── registry.ts      ← 组件注册表
+└── components/extras/
+    └── 组件名.tsx         ← React 附加组件
+```
+
+### Markdown 附加文章
+
+#### 创建步骤
+
+1. 在 `public/blogs/{slug}/extras/` 下创建 `.md` 文件，文件名即 URL 中的 extra 名称
+
+2. 在父博客的 `config.json` 中配置标题：
+
+```json
+{
+  "title": "深度学习基础知识-上",
+  "tags": ["深度学习", "MLP"],
+  "date": "2026-07-15T23:19",
+  "extras": {
+    "detailed-math": "卷积输出尺寸的详细推导"
+  }
+}
+```
+
+- `extras` 字段的 key 对应 `.md` 文件名（不含扩展名），value 为显示标题
+- 仅 Markdown 附加文章需要在此配置标题，React 组件不需要
+
+3. 在主文章 Markdown 中添加链接：
+
+```markdown
+详见 [卷积输出尺寸详细推导](/blog/deeplearning-note-fundamentals-1/detailed-math)
+```
+
+#### 标题 fallback 逻辑
+
+附加文章的标题按以下优先级确定：
+
+1. `config.json` 中 `extras[extra-name]` 的值（推荐方式）
+2. Markdown 文件的第一个标题（`#` 或 `##`）
+3. 文件名（不含扩展名）
+
+### React 附加组件
+
+#### 创建步骤
+
+1. 在 `src/components/extras/` 下创建组件文件，导出接收 `{ blogSlug: string }` props 的 React 组件
+
+2. 在 `src/app/blog/[id]/[...extra]/registry.ts` 中注册：
+
+```ts
+import dynamic from 'next/dynamic'
+
+export const extraRegistry: Record<string, ExtraEntry> = {
+  'three-demo': {
+    type: 'component',
+    component: dynamic(() => import('@/components/extras/three-demo'), { ssr: false }),
+  },
+}
+```
+
+- key 为 URL 中的 extra 名称
+- 使用 `next/dynamic` 懒加载，`ssr: false` 避免 Three.js 等服务端不可用的库报错
+
+3. 在主文章 Markdown 中添加链接：
+
+```markdown
+查看 [3D 交互演示](/blog/deeplearning-note-fundamentals-1/three-demo)
+```
+
+#### 组件附加页面行为
+
+与 Markdown 附加文章不同，组件附加页面**不显示**：标题、日期、字数统计、目录、滚动进度条、点赞按钮。只显示返回链接和组件本身。
+
+### 路由解析流程
+
+```
+访问 /blog/my-article/detailed-math
+        ↓
+[ id ] / [ ...extra ] / page.tsx
+  params = { id: 'my-article', extra: ['detailed-math'] }
+        ↓
+extraName = extra.join('/') = 'detailed-math'
+        ↓
+查 registry.ts → getExtraComponent('detailed-math')
+  ├─ 命中（已注册） → 渲染 React 组件
+  └─ 未命中          → 作为 Markdown 处理
+       ↓
+     fetch('/blogs/my-article/extras/detailed-math.md')
+     fetch('/blogs/my-article/config.json')  → 取 date + extras 标题
+       ↓
+     渲染：标题 + 日期 + 字数统计 + 正文 + 侧边栏（TOC/点赞/返回顶部）
+```
+
 ## 站点配置中影响博客的开关
 
 `src/config/site-content.json` 中的以下字段影响博客行为：

@@ -529,7 +529,7 @@ $$\begin{bmatrix} 4 & 6 & 0 & 7 & 9 & 0 & 0 & 0 & 0 \\ 0 & 4 & 6 & 0 & 7 & 9 & 0
 > 2. **构建大矩阵**：随着滑动窗口遍历整张图，所有这些列向量拼成了一个巨大的二维矩阵。这确实会导致内存占用变大（由于滑窗重叠，部分像素被复制了多次）
 > 3. **转化为 GEMM**：此时，原本复杂的嵌套循环滑窗，被彻底转化为一次标准的通用矩阵乘法 (GEMM)，从而可以利用底层对 GEMM 的优化提升性能
 >  
->  ![](/blogs/deeplearning-note-fundamentals/im2col.png)
+>  ![](/blogs/deeplearning-note-fundamentals-1/im2col.png)
 
 > [!tip] 图卷积神经网络 GCN
 > 很多 3D 对象都是由顶点 (Vertices) 和拓扑边 (Edges) 构成的不规则多边形网格 (Mesh)
