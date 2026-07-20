@@ -1,5 +1,7 @@
 结合 AI 完成了这份深度学习基础知识的笔记
 
+相关文章：[深度学习基础知识-上](/blog/deeplearning-note-fundamentals-1)
+
 ## 序列建模与注意力机制
 
 ### 循环神经网络 RNN

@@ -1,0 +1,13 @@
+{
+  "title": "论文阅读汇总",
+  "tags": [
+    "论文",
+    "多智能体"
+  ],
+  "date": "2026-07-20T15:20",
+  "extras": {
+    "2026-7-20_review2024": "多智能体系统综述"
+  },
+  "summary": "对有价值的文章进行记录，方便后续查阅和参考",
+  "cover": "/blogs/paper-reading/cover.jpeg"
+}

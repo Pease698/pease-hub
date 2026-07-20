@@ -6,13 +6,13 @@ export interface ExtraEntry {
 	component: ComponentType<{ blogSlug: string }>
 }
 
-// const extraRegistry: Record<string, ExtraEntry> = {
-// 	'three-demo': {
-// 		type: 'component',
-// 		component: dynamic(() => import('@/components/extras/three-demo'), { ssr: false })
-// 	}
-// }
+const extraRegistry: Record<string, ExtraEntry> = {
+	// 'three-demo': {
+	// 	type: 'component',
+	// 	component: dynamic(() => import('@/components/extras/three-demo'), { ssr: false })
+	// }
+}
 
-// export function getExtraComponent(name: string): ExtraEntry | null {
-// 	return extraRegistry[name] ?? null
-// }
+export function getExtraComponent(name: string): ExtraEntry | null {
+	return extraRegistry[name] ?? null
+}

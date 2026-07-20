@@ -28,5 +28,18 @@
     "cover": "/blogs/deeplearning-note-fundamentals-2/TransformerArch.png",
     "hidden": false,
     "category": "笔记"
+  },
+  {
+    "slug": "paper-reading",
+    "title": "论文阅读汇总",
+    "tags": [
+      "论文",
+      "多智能体"
+    ],
+    "date": "2026-07-20T15:20",
+    "summary": "对有价值的文章进行记录，方便后续查阅和参考",
+    "cover": "/blogs/paper-reading/cover.jpeg",
+    "hidden": false,
+    "category": ""
   }
 ]

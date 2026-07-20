@@ -63,6 +63,35 @@ type BlogConfig = {
 }
 ```
 
+### `index.md` — 文章正文
+
+文章正文使用 Markdown 编写，支持完整的 GFM 语法、KaTeX 数学公式、代码高亮、GitHub 风格 Callout。
+
+#### 图片
+
+基本语法：
+
+```markdown
+![alt 文本](/blogs/slug/image.png)
+```
+
+图片默认最大宽度为容器 70%，居中显示。
+
+**设置图片尺寸**：Markdown 原生语法不支持尺寸参数，可使用 HTML `<img>` 标签替代：
+
+```markdown
+<!-- 固定像素宽度 -->
+<img src="/blogs/slug/image.png" width="500" />
+
+<!-- 百分比宽度 -->
+<img src="/blogs/slug/image.png" width="100%" />
+
+<!-- 同时指定宽高 -->
+<img src="/blogs/slug/image.png" width="400" height="300" />
+```
+
+点击图片可放大预览。
+
 ### `index.json` — 全局文章索引
 
 位于 `public/blogs/index.json`，是所有文章的聚合列表，由前端编辑操作自动维护（若仓库直接添加文章需要手动修改）。

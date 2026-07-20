@@ -1,5 +1,7 @@
 结合 AI 完成了这份深度学习基础知识的笔记
 
+相关文章：[深度学习基础知识-下](/blog/deeplearning-note-fundamentals-2)
+
 ## 符号/连接/行为主义
 
 1. **符号主义(Symbolism)：**

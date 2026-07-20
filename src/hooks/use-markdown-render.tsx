@@ -46,8 +46,8 @@ export function useMarkdownRender(markdown: string): MarkdownRenderResult {
 					const options: HTMLReactParserOptions = {
 						replace(domNode: DOMNode) {
 							if (domNode instanceof Element && domNode.name === 'img') {
-								const { src, alt, title } = domNode.attribs
-								return <MarkdownImage src={src} alt={alt} title={title} />
+								const { src, alt, title, width, height } = domNode.attribs
+								return <MarkdownImage src={src} alt={alt} title={title} width={width} height={height} />
 							}
 							// Handle code block placeholders in text nodes
 							if (domNode.type === 'text' && domNode.data && domNode.data.includes('__CODE_BLOCK_')) {
