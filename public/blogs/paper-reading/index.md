@@ -2,6 +2,6 @@
 
 ## 多智能体系统
 
-一篇2024年的 [多智能体系统综述](/blog/paper-reading/2026-7-20_review2024)
-
+- 一篇2024年的 [多智能体系统综述](/blog/paper-reading/2026-7-20_review2024)
+- [CAMEL 多智能体系统架构](/blog/paper-reading/2026-7-20_CAMEL)
 
