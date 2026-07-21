@@ -21,19 +21,15 @@
 	],
 	"artImages": [
 		{
-			"id": "cat",
-			"url": "/images/art/cat.png"
+			"id": "Bocchi_cartoon",
+			"url": "/images/art/Bocchi_cartoon_1.jpg"
 		},
 		{
-			"id": "a46372ff45bc5524",
-			"url": "/images/art/a46372ff45bc5524.jpg"
-		},
-		{
-			"id": "1c7b726fe720679b",
-			"url": "/images/art/1c7b726fe720679b.jpg"
+			"id": "Bocchi",
+			"url": "/images/art/Bocchi_3.jpg"
 		}
 	],
-	"currentArtImageId": "a46372ff45bc5524",
+	"currentArtImageId": "Bocchi",
 	"backgroundImages": [
 		{
 			"id": "",
