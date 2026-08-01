@@ -41,5 +41,18 @@
     "cover": "/blogs/paper-reading/cover.jpeg",
     "hidden": false,
     "category": ""
+  },
+  {
+    "slug": "leetcode",
+    "title": "leetcode刷题记录",
+    "tags": [
+      "leetcode",
+      "算法"
+    ],
+    "date": "2026-08-01T22:35",
+    "summary": "记录leetcode刷题过程，方便后续查阅和复习",
+    "cover": "/blogs/leetcode/cover.jpg",
+    "hidden": false,
+    "category": ""
   }
 ]

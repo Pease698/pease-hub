@@ -38,13 +38,69 @@ function BackLink({ blogSlug }: { blogSlug: string }) {
 	)
 }
 
-function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: string }) {
+function MarkdownContent({
+	markdown,
+	blogSlug,
+	extraName,
+	parentConfig
+}: {
+	markdown: string
+	blogSlug: string
+	extraName: string
+	parentConfig: { date?: string; extras?: Record<string, string> } | null
+}) {
 	const { maxSM: isMobile } = useSize()
+	const { content, toc, loading: rendering } = useMarkdownRender(markdown)
+
+	const title = parentConfig?.extras?.[extraName] ?? toc[0]?.text ?? extraName
+	const stats = getReadingStats(markdown)
+	const date = parentConfig?.date ? dayjs(parentConfig.date).format('YYYY年 M月 D日') : null
+
+	if (rendering) {
+		return (
+			<>
+				<ScrollBar />
+				<div className='mx-auto max-w-[1140px] px-6 pt-24'>
+					<BackLink blogSlug={blogSlug} />
+				</div>
+				<div className='text-secondary flex items-center justify-center text-sm'>渲染中...</div>
+			</>
+		)
+	}
+
+	return (
+		<>
+			<ScrollBar />
+			<div className='mx-auto max-w-[1140px] px-6 pt-24'>
+				<BackLink blogSlug={blogSlug} />
+			</div>
+			<div className='mx-auto flex max-w-[1140px] justify-center gap-6 px-6 pb-12 max-sm:px-0'>
+				<motion.article
+					initial={{ opacity: 0 }}
+					animate={{ opacity: 1 }}
+					transition={{ delay: INIT_DELAY }}
+					className='card bg-article static flex-1 overflow-auto rounded-xl p-8'>
+					<div>
+						<div className='text-center text-xl font-semibold'>{title}</div>
+						{date && <div className='text-secondary mt-2 text-center text-sm'>{date}</div>}
+						<div className='text-secondary mt-2 text-center text-sm'>
+							本文总计 {stats.chars} 字 | 预计阅读时间 {stats.minutes} min
+						</div>
+						<div className='prose mt-6 max-w-none cursor-text'>{content}</div>
+					</div>
+				</motion.article>
+
+				{!isMobile && <BlogSidebar toc={toc} slug={blogSlug} />}
+			</div>
+		</>
+	)
+}
+
+function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: string }) {
 	const [markdown, setMarkdown] = useState<string | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 	const [parentConfig, setParentConfig] = useState<{ date?: string; extras?: Record<string, string> } | null>(null)
-	const { content, toc, loading: rendering } = useMarkdownRender(markdown || '')
 
 	useEffect(() => {
 		let cancelled = false
@@ -86,11 +142,7 @@ function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: s
 		}
 	}, [blogSlug])
 
-	const title = parentConfig?.extras?.[extraName] ?? toc[0]?.text ?? extraName
-	const stats = markdown ? getReadingStats(markdown) : { chars: 0, minutes: 0 }
-	const date = parentConfig?.date ? dayjs(parentConfig.date).format('YYYY年 M月 D日') : null
-
-	if (loading || rendering) {
+	if (loading || !markdown) {
 		return (
 			<>
 				<ScrollBar />
@@ -114,32 +166,7 @@ function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: s
 		)
 	}
 
-	return (
-		<>
-			<ScrollBar />
-			<div className='mx-auto max-w-[1140px] px-6 pt-24'>
-				<BackLink blogSlug={blogSlug} />
-			</div>
-			<div className='mx-auto flex max-w-[1140px] justify-center gap-6 px-6 pb-12 max-sm:px-0'>
-				<motion.article
-					initial={{ opacity: 0 }}
-					animate={{ opacity: 1 }}
-					transition={{ delay: INIT_DELAY }}
-					className='card bg-article static flex-1 overflow-auto rounded-xl p-8'>
-					<div>
-						<div className='text-center text-xl font-semibold'>{title}</div>
-						{date && <div className='text-secondary mt-2 text-center text-sm'>{date}</div>}
-						<div className='text-secondary mt-2 text-center text-sm'>
-							本文总计 {stats.chars} 字 | 预计阅读时间 {stats.minutes} min
-						</div>
-						<div className='prose mt-6 max-w-none cursor-text'>{content}</div>
-					</div>
-				</motion.article>
-
-				{!isMobile && <BlogSidebar toc={toc} slug={blogSlug} />}
-			</div>
-		</>
-	)
+	return <MarkdownContent markdown={markdown} blogSlug={blogSlug} extraName={extraName} parentConfig={parentConfig} />
 }
 
 function ComponentExtra({ blogSlug, extraName }: { blogSlug: string; extraName: string }) {

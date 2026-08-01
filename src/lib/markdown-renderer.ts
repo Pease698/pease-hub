@@ -125,13 +125,9 @@ function convertCallouts(html: string): string {
 
 // Lazy load shiki to handle environments where it's not available (e.g., Cloudflare Workers)
 let shikiModule: typeof import('shiki') | null = null
-let shikiLoadAttempted = false
 
 async function loadShiki() {
-	if (shikiLoadAttempted) {
-		return shikiModule
-	}
-	shikiLoadAttempted = true
+	if (shikiModule) return shikiModule
 
 	try {
 		shikiModule = await import('shiki')
@@ -144,12 +140,9 @@ async function loadShiki() {
 
 // Lazy load katex to handle environments where it's not available (e.g., Cloudflare Workers)
 let katexModule: typeof import('katex') | null = null
-let katexLoadAttempted = false
 
 async function loadKatex() {
 	if (katexModule) return katexModule
-	if (katexLoadAttempted) return null
-	katexLoadAttempted = true
 
 	try {
 		// katex is published as CJS; depending on bundler/runtime the dynamic import
@@ -189,7 +182,7 @@ export async function renderMarkdown(markdown: string): Promise<MarkdownRenderRe
 				return `<pre data-code="${escapedCode}">${codeData.html}</pre>`
 			}
 			// Fallback for failed highlighting
-			return `<pre data-code="${escapedCode}"><code>${codeData.original}</code></pre>`
+			return `<pre data-code="${escapedCode}"><code>${escapedCode}</code></pre>`
 		}
 		// Fallback to default (inline code, not code block)
 		return `<code>${token.text}</code>`
