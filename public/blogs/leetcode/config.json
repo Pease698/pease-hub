@@ -6,7 +6,8 @@
   ],
   "date": "2026-08-01T22:35",
   "extras": {
-    "2026-08-01_SumofTwoNums": "leetcode-001 两数之和"
+    "2026-08-01_two-sum": "leetcode-001 两数之和",
+    "2026-08-05_intersection-of-two-linked-lists": "leetcode-160 相交链表"
   },
   "summary": "记录leetcode刷题过程，方便后续查阅和复习",
   "cover": "/blogs/leetcode/cover.jpg"
