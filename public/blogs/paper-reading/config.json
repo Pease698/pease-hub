@@ -8,7 +8,8 @@
   "extras": {
     "2026-07-20_review2024": "多智能体系统综述",
     "2026-07-20_CAMEL": "CAMEL架构",
-    "2026-07-21_MetaGPT": "MetaGPT架构"
+    "2026-07-21_MetaGPT": "MetaGPT架构",
+    "2026-08-10_AgentClinic": "AgentClinic测试框架"
   },
   "summary": "对有价值的文章进行记录，方便后续查阅和参考",
   "cover": "/blogs/paper-reading/cover.jpeg"

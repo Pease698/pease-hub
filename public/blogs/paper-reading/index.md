@@ -6,3 +6,9 @@
 - [CAMEL 多智能体系统架构](/blog/paper-reading/2026-07-20_CAMEL)
 - [MetaGPT 多智能体系统架构](/blog/paper-reading/2026-07-21_MetaGPT)
 
+## 医学多智能体
+
+### benchmark
+
+- [AgentClinic 测试框架](/blog/paper-reading/2026-08-10_AgentClinic)
+
