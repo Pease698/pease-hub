@@ -6,6 +6,7 @@ import Link from 'next/link'
 import dayjs from 'dayjs'
 import { motion } from 'motion/react'
 import { INIT_DELAY } from '@/consts'
+import type { BlogConfig } from '@/app/blog/types'
 import { useMarkdownRender } from '@/hooks/use-markdown-render'
 import { useSize } from '@/hooks/use-size'
 import { getExtraComponent } from './registry'
@@ -47,14 +48,21 @@ function MarkdownContent({
 	markdown: string
 	blogSlug: string
 	extraName: string
-	parentConfig: { date?: string; extras?: Record<string, string> } | null
+	parentConfig: BlogConfig | null
 }) {
 	const { maxSM: isMobile } = useSize()
 	const { content, toc, loading: rendering } = useMarkdownRender(markdown)
 
-	const title = parentConfig?.extras?.[extraName] ?? toc[0]?.text ?? extraName
+	const extraMeta = parentConfig?.extras?.[extraName]
+	const title = typeof extraMeta === 'string' ? extraMeta : extraMeta?.title ?? toc[0]?.text ?? extraName
 	const stats = getReadingStats(markdown)
-	const date = parentConfig?.date ? dayjs(parentConfig.date).format('YYYY年 M月 D日') : null
+
+	const extraDate = typeof extraMeta === 'object' ? extraMeta?.date : undefined
+	const date = extraDate !== undefined
+		? dayjs(extraDate).format('YYYY年 M月 D日')
+		: parentConfig?.date
+			? dayjs(parentConfig.date).format('YYYY年 M月 D日')
+			: null
 
 	if (rendering) {
 		return (
@@ -100,7 +108,7 @@ function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: s
 	const [markdown, setMarkdown] = useState<string | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
-	const [parentConfig, setParentConfig] = useState<{ date?: string; extras?: Record<string, string> } | null>(null)
+	const [parentConfig, setParentConfig] = useState<BlogConfig | null>(null)
 
 	useEffect(() => {
 		let cancelled = false
