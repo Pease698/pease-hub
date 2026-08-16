@@ -69,5 +69,21 @@
     "cover": "/blogs/machine-learning-1/3_sigmoid.png",
     "hidden": false,
     "category": "笔记"
+  },
+  {
+    "slug": "machine-learning-2",
+    "title": "机器学习-2 决策树",
+    "tags": [
+      "机器学习",
+      "决策树",
+      "笔记"
+    ],
+    "date": "2026-08-16T23:48",
+    "extras": {
+    },
+    "summary": "西瓜书第四章决策树的学习笔记，包括 ID3、C4.5、CART 等",
+    "cover": "/blogs/machine-learning-2/4_decisionTree.png",
+    "hidden": false,
+    "category": "笔记"
   }
 ]
