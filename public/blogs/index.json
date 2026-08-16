@@ -34,7 +34,7 @@
     "title": "论文阅读汇总",
     "tags": [
       "论文",
-      "多智能体"
+      "医学多智能体"
     ],
     "date": "2026-07-20T15:20",
     "summary": "对有价值的文章进行记录，方便后续查阅和参考",
@@ -54,5 +54,20 @@
     "cover": "/blogs/leetcode/cover.jpg",
     "hidden": false,
     "category": ""
+  },
+  {
+    "slug": "machine-learning-1",
+    "title": "机器学习-1 线性模型",
+    "tags": [
+      "机器学习",
+      "线性回归",
+      "LDA",
+      "笔记"
+    ],
+    "date": "2026-08-16T14:48",
+    "summary": "西瓜书第三章线性模型的学习笔记，包括线性回归、对数记录回归、二分类 LDA 问题等",
+    "cover": "/blogs/machine-learning-1/3_sigmoid.png",
+    "hidden": false,
+    "category": "笔记"
   }
 ]
