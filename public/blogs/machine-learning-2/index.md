@@ -1,6 +1,8 @@
 跟着 B 站上一门 [机器学习的课](https://www.bilibili.com/video/BV1puGv6TEjV/?spm_id_from=333.1007.top_right_bar_window_default_collection.content.click&vd_source=b4b6b348eb2ec24665e87125a8cf8851) 进行学习，参考教材为周志华教授的西瓜书以及配套的南瓜书
 
- 决策树可以看作一堆 `if-else` 语句的组合。它希望通过特征特征越分越 “纯”。以下是 “判断一个西瓜是否为好瓜” 的决策树示意图
+[其他笔记请点击](/blog/machine-learning-1/MLdir)
+
+决策树可以看作一堆 `if-else` 语句的组合。它希望通过特征特征越分越 “纯”。以下是 “判断一个西瓜是否为好瓜” 的决策树示意图
  
 ![](/blogs/machine-learning-2/4_decisionTree.png)
 

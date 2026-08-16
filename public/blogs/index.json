@@ -5,8 +5,7 @@
     "tags": [
       "深度学习",
       "MLP",
-      "CNN",
-      "笔记"
+      "CNN"
     ],
     "date": "2026-07-15T23:19",
     "summary": "暑假开始努力补齐深度学习领域的知识，笔记上半部分包括线性回归、MLP、CNN 等的基础内容，后续会有更多学习笔记。",
@@ -20,8 +19,7 @@
     "tags": [
       "深度学习",
       "RNN",
-      "Transformer",
-      "笔记"
+      "Transformer"
     ],
     "date": "2026-07-15T23:21",
     "summary": "笔记下半部分包括 RNN、Transformer 架构等的基础内容，后续会有更多学习笔记。",
@@ -40,7 +38,7 @@
     "summary": "对有价值的文章进行记录，方便后续查阅和参考",
     "cover": "/blogs/paper-reading/cover.jpeg",
     "hidden": false,
-    "category": ""
+    "category": "合集"
   },
   {
     "slug": "leetcode",
@@ -53,7 +51,7 @@
     "summary": "记录leetcode刷题过程，方便后续查阅和复习",
     "cover": "/blogs/leetcode/cover.jpg",
     "hidden": false,
-    "category": ""
+    "category": "合集"
   },
   {
     "slug": "machine-learning-1",
@@ -61,8 +59,7 @@
     "tags": [
       "机器学习",
       "线性回归",
-      "LDA",
-      "笔记"
+      "LDA"
     ],
     "date": "2026-08-16T14:48",
     "summary": "西瓜书第三章线性模型的学习笔记，包括线性回归、对数记录回归、二分类 LDA 问题等",
@@ -75,8 +72,7 @@
     "title": "机器学习-2 决策树",
     "tags": [
       "机器学习",
-      "决策树",
-      "笔记"
+      "决策树"
     ],
     "date": "2026-08-16T23:48",
     "extras": {
