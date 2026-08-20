@@ -2,5 +2,6 @@
 
 - 第三章 [线性模型](/blog/machine-learning-1)
 - 第四章 [决策树](/blog/machine-learning-2)
+- 第五章 [神经网络](/blog/machine-learning-3)
 - 未完待续...
 

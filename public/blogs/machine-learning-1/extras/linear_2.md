@@ -23,6 +23,15 @@ $$
 > 
 > ![](/blogs/machine-learning-1/extras/pic/3_nabla.png)
 
+> [!tip]
+> 函数梯度 $\nabla f(\mathbf{x})$ 可以表示函数于此处增长最快的方向
+> 
+> 假设于 $\mathbf{x}$ 处向 $\mathbf{d}$ 方向移动微小距离，则使用一阶泰勒展开可以得到：
+> $$
+> f(\mathbf{x} + \varepsilon \mathbf{d}) \approx f(\mathbf{x}) + \varepsilon \nabla f(\mathbf{x})^{\mathrm{T}} \mathbf{d}
+> $$
+> 即沿 $\mathbf{d}$ 方向移动的变化速率为 $\nabla f(\mathbf{x})\mathbf{d}=\left\|\nabla f(\mathbf{x})\right\|cos\theta$（设 $\left\|\mathbf{d}\right\|=1$）。可见，若 $\nabla f(\mathbf{x})$ 与 $\mathbf{d}$ 同方向即 $\theta=0$，此时可以达到最大值；若反向则为反向最大值
+
 在没有等式约束的可导函数求极值时，我们可以通过计算函数梯度并令其为 0 以直接计算得到极值点。该方法的原理在于：
 - 当 $\nabla f(\mathbf{x}_0)\ne 0$ 时，说明函数在当前点处存在变化趋势，总可以找到一个移动方向（设可用向量 $\mathbf{d}$ 表示）使得 $\nabla f(\mathbf{x})^\mathrm{T}\mathbf{d}<0$，即沿该方向移动能使函数值更小（反之可使函数值更大），所以并非极值点
 - 当 $\nabla f(\mathbf{x})=0$ 时，说明函数在当前点处各个方向移动都无法变化函数值，此时称达到了极值点

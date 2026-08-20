@@ -75,10 +75,25 @@
       "决策树"
     ],
     "date": "2026-08-16T23:48",
-    "extras": {
-    },
     "summary": "西瓜书第四章决策树的学习笔记，包括 ID3、C4.5、CART 等",
     "cover": "/blogs/machine-learning-2/4_decisionTree.png",
+    "hidden": false,
+    "category": "笔记"
+  },
+  {
+    "slug": "machine-learning-3",
+    "title": "机器学习-3 神经网络",
+    "tags": [
+      "机器学习",
+      "感知机",
+      "多层感知机",
+      "BP 算法"
+    ],
+    "date": "2026-08-20T10:51",
+    "extras": {
+    },
+    "summary": "西瓜书第五章神经网络的学习笔记，包括感知机、多层感知机、BP 算法等",
+    "cover": "/blogs/machine-learning-3/5_MLP.png",
     "hidden": false,
     "category": "笔记"
   }
