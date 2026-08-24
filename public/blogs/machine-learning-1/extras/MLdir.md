@@ -6,5 +6,6 @@
 - 第六章 [支持向量机](/blog/machine-learning-4)
 - 第七章 [贝叶斯分类器](/blog/machine-learning-5)
 - 第八章 [集成学习](/blog/machine-learning-6)
+- 第九章 [聚类](/blog/machine-learning-7)
 - 未完待续...
 
