@@ -5,5 +5,6 @@
 - 第五章 [神经网络](/blog/machine-learning-3)
 - 第六章 [支持向量机](/blog/machine-learning-4)
 - 第七章 [贝叶斯分类器](/blog/machine-learning-5)
+- 第八章 [集成学习](/blog/machine-learning-6)
 - 未完待续...
 
