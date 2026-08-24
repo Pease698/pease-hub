@@ -4,5 +4,6 @@
 - 第四章 [决策树](/blog/machine-learning-2)
 - 第五章 [神经网络](/blog/machine-learning-3)
 - 第六章 [支持向量机](/blog/machine-learning-4)
+- 第七章 [贝叶斯分类器](/blog/machine-learning-5)
 - 未完待续...
 
