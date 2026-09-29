@@ -68,12 +68,15 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 
 > 站内显示名为「我的专栏」，代码与 URL 仍沿用 `collections`（`/collections`、`collections.json`、`CollectionItem` 等），二者是同一概念。
 
-- 注册表：`public/blogs/collections.json`（专栏元信息 + 成员文章 slug，展示顺序按各文章 `config.json` 的时间倒序）
+- 注册表：`public/blogs/collections.json`（专栏元信息 + 成员文章 slug，**手工维护**；展示顺序按时间倒序，不手工排序）
+- 扁平索引：`public/blogs/collection-articles.json`（**构建期自动生成**，含全部专栏文章的标题/日期/标签/摘要/封面 → 前端 **1 次请求**取全，不再逐篇请求 `config.json`）
+- 生成脚本：`scripts/gen-collections-index.js`（`pnpm collections:index`；`dev`/`build`/`build:cf` 前自动执行；顺带做封面回退——专栏文章无自有封面时用专栏封面）
 - 专栏正文：`public/blogs/{collection}/index.md` + `cover.*`
 - 专栏文章：`public/blogs/{collection}/articles/{article}/`，每篇是一个**完整的普通文章目录**（`config.json` + `index.md`）
 - 渲染：专栏文章页与 `/blog/{slug}` **共用** `@/components/blog-preview` 的 `<BlogPreview>`，表现完全一致
 - 列表页布局：参照 `/projects`（双列卡片 `max-w-[1200px]`）
-- 检索分两步：`/collections` 首屏**只加载注册表**（1 个请求）并显示搜索入口；进入 `/collections/search` 才加载全部文章与标签（跨专栏，**标题关键词**（留空不筛）+ **标签多选 AND**，含候选数量、会归零的标签置灰，默认列出全部文章）
+- 检索分两步：`/collections` 首屏**只加载注册表**（1 个请求）并显示搜索入口；进入 `/collections/search` 才加载扁平索引（1 个请求）拿到全部标签与文章（跨专栏，**标题关键词**（留空不筛）+ **标签多选 AND**，含候选数量、会归零的标签置灰，默认列出全部文章）
+- 首页信息流：「最新文章」「随机推荐」通过 `src/hooks/use-article-feed.ts` 合并普通文章与专栏文章后取最新/随机
 - 注意：`/collections/search` 为静态路由，会遮蔽同名专栏，勿将专栏 slug 命名为 `search`
 - 旧链接 `/blog/{collection}[/{article}]` 会自动重定向到 `/collections/...`
 

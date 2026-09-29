@@ -1,0 +1,86 @@
+[
+	{
+		"collection": "paper-reading",
+		"collectionTitle": "论文阅读汇总",
+		"slug": "2026-08-10_AgentClinic",
+		"title": "AgentClinic测试框架",
+		"date": "2026-08-10",
+		"tags": [
+			"论文",
+			"医学多智能体",
+			"benchmark"
+		],
+		"summary": "AgentClinic 医学多智能体 benchmark 论文笔记：在模拟临床环境中评测 AI 的问诊与工具调用能力。",
+		"cover": "/blogs/paper-reading/cover.jpeg"
+	},
+	{
+		"collection": "leetcode",
+		"collectionTitle": "leetcode刷题记录",
+		"slug": "2026-08-05_intersection-of-two-linked-lists",
+		"title": "leetcode-160 相交链表",
+		"date": "2026-08-05",
+		"tags": [
+			"leetcode",
+			"链表",
+			"双指针"
+		],
+		"summary": "leetcode 160 相交链表：双指针互相走完对方链表求交点。",
+		"cover": "/blogs/leetcode/cover.jpg"
+	},
+	{
+		"collection": "leetcode",
+		"collectionTitle": "leetcode刷题记录",
+		"slug": "2026-08-01_two-sum",
+		"title": "leetcode-001 两数之和",
+		"date": "2026-08-01",
+		"tags": [
+			"leetcode",
+			"哈希",
+			"数组"
+		],
+		"summary": "leetcode 001 两数之和：哈希表一次遍历的解法与思路记录。",
+		"cover": "/blogs/leetcode/cover.jpg"
+	},
+	{
+		"collection": "paper-reading",
+		"collectionTitle": "论文阅读汇总",
+		"slug": "2026-07-21_MetaGPT",
+		"title": "MetaGPT架构",
+		"date": "2026-07-21",
+		"tags": [
+			"论文",
+			"多智能体",
+			"MetaGPT"
+		],
+		"summary": "MetaGPT 多智能体框架论文笔记：以 SOP 与元编程把自然语言需求转化为可执行流程。",
+		"cover": "/blogs/paper-reading/cover.jpeg"
+	},
+	{
+		"collection": "paper-reading",
+		"collectionTitle": "论文阅读汇总",
+		"slug": "2026-07-20_review2024",
+		"title": "多智能体系统综述",
+		"date": "2026-07-20",
+		"tags": [
+			"论文",
+			"多智能体",
+			"综述"
+		],
+		"summary": "2024 年 LLM 驱动的多智能体系统综述论文笔记，梳理该领域的进展与挑战。",
+		"cover": "/blogs/paper-reading/cover.jpeg"
+	},
+	{
+		"collection": "paper-reading",
+		"collectionTitle": "论文阅读汇总",
+		"slug": "2026-07-20_CAMEL",
+		"title": "CAMEL架构",
+		"date": "2026-07-20",
+		"tags": [
+			"论文",
+			"多智能体",
+			"CAMEL"
+		],
+		"summary": "CAMEL 多智能体框架论文笔记：通过角色扮演与对话驱动实现 LLM 智能体协作。",
+		"cover": "/blogs/paper-reading/cover.jpeg"
+	}
+]

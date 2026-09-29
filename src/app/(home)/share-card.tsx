@@ -1,26 +1,20 @@
 'use client'
 
-import { useMemo } from 'react'
 import Card from '@/components/card'
 import { useCenterStore } from '@/hooks/use-center'
 import { useConfigStore } from './stores/config-store'
 import { CARD_SPACING } from '@/consts'
-import { useBlogIndex } from '@/hooks/use-blog-index'
+import { useRandomArticle } from '@/hooks/use-article-feed'
 import Link from 'next/link'
 import { HomeDraggableLayer } from './home-draggable-layer'
 
 export default function ShareCard() {
 	const center = useCenterStore()
 	const { cardStyles, siteContent } = useConfigStore()
-	const { items, loading } = useBlogIndex()
+	const { article, loading } = useRandomArticle()
 	const styles = cardStyles.shareCard
 	const hiCardStyles = cardStyles.hiCard
 	const socialButtonsStyles = cardStyles.socialButtons
-
-	const randomBlog = useMemo(() => {
-		if (items.length === 0) return null
-		return items[Math.floor(Math.random() * items.length)]
-	}, [items])
 
 	const x = styles.offsetX !== null ? center.x + styles.offsetX : center.x + hiCardStyles.width / 2 - socialButtonsStyles.width
 	const y = styles.offsetY !== null ? center.y + styles.offsetY : center.y + hiCardStyles.height / 2 + CARD_SPACING + socialButtonsStyles.height + CARD_SPACING
@@ -45,19 +39,19 @@ export default function ShareCard() {
 					<div className='flex h-[60px] items-center justify-center'>
 						<span className='text-secondary text-xs'>加载中...</span>
 					</div>
-				) : randomBlog ? (
-					<Link href={`/blog/${randomBlog.slug}`} className='mt-2 block space-y-2'>
+				) : article ? (
+					<Link href={article.href} className='mt-2 block space-y-2'>
 						<div className='flex items-center'>
 							<div className='relative mr-3 h-12 w-12 shrink-0 overflow-hidden rounded-xl'>
-								{randomBlog.cover ? (
-									<img src={randomBlog.cover} alt={randomBlog.title} className='h-full w-full object-cover' />
+								{article.cover ? (
+									<img src={article.cover} alt={article.title} className='h-full w-full object-cover' />
 								) : (
 									<div className='text-secondary grid h-full w-full place-items-center rounded-xl bg-white/60'>+</div>
 								)}
 							</div>
-							<h3 className='text-sm font-medium'>{randomBlog.title || randomBlog.slug}</h3>
+							<h3 className='text-sm font-medium'>{article.title}</h3>
 						</div>
-						{randomBlog.summary && <p className='text-secondary line-clamp-3 text-xs'>{randomBlog.summary}</p>}
+						{article.summary && <p className='text-secondary line-clamp-3 text-xs'>{article.summary}</p>}
 					</Link>
 				) : (
 					<div className='flex h-[60px] items-center justify-center'>

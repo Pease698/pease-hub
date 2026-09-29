@@ -12,7 +12,8 @@
 public/blogs/
 ├── index.json                       # 普通文章索引（专栏不在这里）
 ├── categories.json                  # 普通文章分类
-├── collections.json                 # 专栏注册表（专栏元信息 + 成员文章 slug）
+├── collections.json                 # 专栏注册表（专栏元信息 + 成员文章 slug，手工维护）
+├── collection-articles.json         # ★ 构建期生成的扁平索引：全部专栏文章的元信息（1 次请求即可取全）
 ├── paper-reading/                   # 一个专栏
 │   ├── index.md                     # 专栏介绍（渲染在专栏主页正文位置）
 │   ├── cover.jpeg                   # 专栏封面
@@ -30,13 +31,23 @@ public/blogs/
 
 **每篇专栏文章都是一个"普通文章"目录**：结构、`config.json`、`index.md` 与 `public/blogs/{slug}/` 完全一致，只是多了一层 `{collection}/articles/`。
 
+### 两套索引的分工
+
+| 文件 | 维护方式 | 用途 |
+|------|---------|------|
+| `collections.json` | **手工**：专栏元信息 + 成员 slug 列表 | 成员关系、专栏卡片、"N 篇"计数 |
+| `collection-articles.json` | **自动生成**（`scripts/gen-collections-index.js`） | 前端读取全部专栏文章元信息（标题/日期/标签/摘要/封面） |
+
+生成脚本会顺带做**封面回退**：专栏文章没有自己的封面时，采用所属专栏的封面。`pnpm dev` / `pnpm build` / `pnpm build:cf` 都会先自动执行它；也可手动 `pnpm collections:index`。
+**因此新增或修改专栏文章后，记得让它跑一次**（正常走 `pnpm build` / `pnpm dev` 即可；若只改文件不重启，索引会是旧的）。
+
 ## 路由
 
 | 路由 | 页面 | 数据 |
 |------|------|------|
 | `/collections` | 专栏列表（卡片） | `public/blogs/collections.json` |
-| `/collections/{collection}` | 专栏主页：封面 + 介绍 + 按时间串联的文章目录 | `collections.json` + `{collection}/index.md` + 各文章 `config.json` |
-| `/collections/{collection}/{article}` | 专栏文章正文 | `{collection}/articles/{article}/` |
+| `/collections/{collection}` | 专栏主页：封面 + 介绍 + 按时间串联的文章目录 | `collections.json` + `collection-articles.json` + `{collection}/index.md` |
+| `/collections/{collection}/{article}` | 专栏文章正文 | `{collection}/articles/{article}/`（该文章自己的 `config.json` + `index.md`） |
 
 ## 渲染方式
 
@@ -65,7 +76,7 @@ public/blogs/
 | 路由 | 加载的数据 | 说明 |
 |------|-----------|------|
 | `/collections` | 只加载 `collections.json`（**1 个请求**） | 专栏卡片网格 + 一个搜索框样式的**入口按钮** |
-| `/collections/search` | 进入本页才 `loadAllCollectionArticles()`（并行读取每篇文章的 `config.json`） | 搜索态：全部标签 + **默认列出全部文章**作为初始结果 |
+| `/collections/search` | 进入本页才 `loadAllCollectionArticles()`（读取生成的扁平索引，**1 个请求**） | 搜索态：全部标签 + **默认列出全部文章**作为初始结果 |
 
 - 入口按钮是个链接（不是真实 `<input>`）——能聚焦却打不了字的输入框容易被误认为坏了
 - 入口是否显示，只依据 `collections.json` 里各专栏的 `articles` 总数判断，**不触发额外请求**
@@ -87,8 +98,7 @@ public/blogs/
 - 结果列表：日期 · 时间线 · 标题 · 所属专栏徽标 · tags，整行可点，已读显示 `[已阅读]`
 - 计数行常显：未筛选时「共 N 篇」，有筛选时「命中 N 篇」
 - 纯前端内存过滤，无后端与索引服务；**筛选条件不写入 URL**（刷新即回到无筛选、仍列出全部文章）
-
-数据量增长后（大致超过 50 篇）若请求数成为负担，可改为构建期生成扁平索引（仿照 `public/blogs/index.json`）后再检索。
+- 全部专栏文章的元信息来自构建期生成的 `collection-articles.json`，**1 个请求**取全，不随文章数增长
 
 ## 新增一篇专栏文章
 
@@ -102,6 +112,8 @@ public/blogs/
 ```
 
 专栏注册表里**只登记 slug**（表示"这篇文章属于该专栏"）；文章的**标题、日期、标签全部来自它自己的 `config.json`**，专栏页按各文章的 `date` 倒序串联展示，不需要在 `collections.json` 里手工排序或分组。
+
+5. 让索引重新生成一次：`pnpm collections:index`，或直接 `pnpm dev` / `pnpm build`（都会自动执行）。**忘了这步的话，页面读到的仍是旧的 `collection-articles.json`。**
 
 ## 新增一个专栏
 
@@ -127,7 +139,8 @@ public/blogs/
 
 - **点赞**：以 `{collection}/{article}` 为 key（`src/lib/collections.ts` 的 `collectionArticleKey`），每篇文章独立计数。
 - **已读标记**：同样以 `{collection}/{article}` 为 key 记录，在专栏主页目录中显示 `[已阅读]`。
-- **sitemap / RSS**：`src/app/sitemap.ts` 与 `src/app/rss.xml/route.ts` 会读取 `collections.json` 与各文章 `config.json`，把专栏主页和专栏文章一并收录。
+- **sitemap / RSS**：`src/app/sitemap.ts` 与 `src/app/rss.xml/route.ts` 会读取 `collections.json` 与各文章 `config.json`（构建期直接读文件），把专栏主页和专栏文章一并收录。
+- **首页信息流**：`最新文章` 与 `随机推荐` 两张卡片通过 `src/hooks/use-article-feed.ts` 把**普通文章与专栏文章合并**后再取最新 / 随机，因此专栏文章会出现在首页；专栏侧读的是 `collection-articles.json`（1 个请求，模块级缓存）。专栏文章的封面**回退为所属专栏的封面**（生成脚本已写入索引）。
 - **旧链接重定向**：专栏内容此前寄存在 `extras/` 下，旧地址会 301 到新地址：
   - `/blog/{collection}` → `/collections/{collection}`
   - `/blog/{collection}/{article}` → `/collections/{collection}/{article}`
@@ -137,9 +150,11 @@ public/blogs/
 
 | 文件 | 作用 |
 |------|------|
-| `public/blogs/collections.json` | 专栏注册表 |
-| `src/lib/collections.ts` | 注册表读取与缓存、专栏文章 key、跨专栏汇总；检索算法复用 `@/lib/tag-filter` |
-| `src/lib/load-blog.ts` | `loadBlog`（普通文章）/ `loadCollectionArticle`（专栏文章）/ `loadCollectionArticleConfig`（只读元信息） |
+| `public/blogs/collections.json` | 专栏注册表（手工维护：元信息 + 成员 slug） |
+| `public/blogs/collection-articles.json` | 全部专栏文章元信息的扁平索引（**自动生成**，前端 1 次请求取全） |
+| `scripts/gen-collections-index.js` | 生成上面那份索引，并做封面回退（无自有封面时用专栏封面） |
+| `src/lib/collections.ts` | 注册表与扁平索引的读取缓存、专栏文章 key；检索算法复用 `@/lib/tag-filter` |
+| `src/lib/load-blog.ts` | `loadBlog`（普通文章）/ `loadCollectionArticle`（专栏文章正文） |
 | `src/app/collections/page.tsx` | 专栏列表（只加载注册表）+ 搜索入口 |
 | `src/app/collections/search/page.tsx` | 搜索页：进入时才加载全部文章与标签 |
 | `src/app/collections/components/collection-search-entry.tsx` | 搜索入口按钮（搜索框外观的链接） |

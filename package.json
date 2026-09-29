@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack -p 2025",
+    "dev": "node scripts/gen-collections-index.js && next dev --turbopack -p 2025",
     "svg": "node scripts/gen-svgs-index.js",
-    "build": "next build",
+    "collections:index": "node scripts/gen-collections-index.js",
+    "build": "node scripts/gen-collections-index.js && next build",
     "start": "next start",
-    "build:cf": "opennextjs-cloudflare build",
+    "build:cf": "node scripts/gen-collections-index.js && opennextjs-cloudflare build",
     "preview": "opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"

@@ -56,24 +56,11 @@ export async function loadBlog(slug: string): Promise<LoadedBlog> {
 }
 
 /**
- * 只读取专栏文章的元信息（config.json，不拉正文），用于专栏目录页。
- * 读不到时返回空对象，由调用方回退到 slug。
- */
-export async function loadCollectionArticleConfig(collection: string, article: string): Promise<BlogConfig> {
-	if (!collection || !article) return {}
-
-	try {
-		const res = await fetch(`/blogs/${encodeURIComponent(collection)}/articles/${encodeURIComponent(article)}/config.json`)
-		if (!res.ok) return {}
-		return (await res.json()) as BlogConfig
-	} catch {
-		return {}
-	}
-}
-
-/**
  * Load an article that belongs to a collection:
  * public/blogs/{collection}/articles/{article}
+ *
+ * 只读取正文与自己的 config.json；专栏文章的**元信息集合**请走
+ * `@/lib/collections` 的 `loadAllCollectionArticles()`（构建期生成的扁平索引，一次请求）。
  *
  * 注意：collection 与 article 必须分别编码，不能拼成一个带 `/` 的 slug 再编码。
  */

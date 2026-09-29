@@ -104,14 +104,15 @@ src/app/(home)/
 ### share-card.tsx — 随机推荐
 
 - **位置**：社交按钮下方
-- **内容**：从 `share/list.json` 中随机选取一条分享展示（logo + 名称 + 描述），点击跳转 `/share`
+- **内容**：随机推荐**一篇**文章（封面 + 标题 + 摘要），点击进入文章；普通文章与**专栏文章**一起参与随机
+- **数据源**：`useRandomArticle()`（`src/hooks/use-article-feed.ts`，合并 `blogs/index.json` 与各专栏文章的 `config.json`）
 - **移动端**：隐藏
 
 ### aritcle-card.tsx — 最新文章
 
 - **位置**：hi-card 左下方
-- **内容**：展示最新一篇博客的封面、标题、摘要、日期
-- **数据源**：`useLatestBlog()` hook（读取 `blogs/index.json` 第一条）
+- **内容**：展示最新一篇**文章**的封面、标题、摘要、日期；普通文章与**专栏文章**一起比时间
+- **数据源**：`useLatestArticle()`（`src/hooks/use-article-feed.ts`，合并 `blogs/index.json` 与各专栏文章的 `config.json`；专栏侧结果为模块级缓存）
 - **文件名说明**：文件拼写为 `aritcle-card.tsx`（原项目拼写如此，不影响功能）
 
 ### write-buttons.tsx — 操作按钮

@@ -3,17 +3,17 @@
 /**
  * 专栏（Collection）注册表读取。
  *
- * 数据来源：public/blogs/collections.json
- *   - 只登记"专栏元信息 + 成员文章 slug"，成员文章的标题/日期/标签一律取自
- *     各自的 config.json，避免手工维护两份。
+ * 数据来源：
+ *   - public/blogs/collections.json         专栏元信息 + 成员文章 slug（手工维护）
+ *   - public/blogs/collection-articles.json **构建期生成的扁平索引**，含全部专栏文章的
+ *     标题/日期/标签/摘要/封面，前端一次请求即可拿到，不再逐篇请求 config.json
+ *     （由 scripts/gen-collections-index.js 生成，build / build:cf / dev 前自动执行）
  * 专栏正文：public/blogs/{collection}/index.md
  * 专栏文章：public/blogs/{collection}/articles/{article}/(config.json + index.md)
  *
- * 注册表在模块级缓存，整个会话只请求一次。
+ * 两个索引都在模块级缓存，整个会话各只请求一次。
  * 检索相关函数复用 @/lib/tag-filter，与普通文章搜索共用同一套算法（数据源各自独立）。
  */
-
-import { loadCollectionArticleConfig } from '@/lib/load-blog'
 
 export type { TagOption } from '@/lib/tag-filter'
 
@@ -40,9 +40,13 @@ export type CollectionArticle = {
 	collection: string
 	/** 所属专栏标题 */
 	collectionTitle: string
+	/** 来自文章自己的 config.json，供首页卡片等信息流场景使用 */
+	summary?: string
+	cover?: string
 }
 
 export const COLLECTIONS_PATH = '/blogs/collections.json'
+export const COLLECTION_ARTICLES_PATH = '/blogs/collection-articles.json'
 
 let collectionsPromise: Promise<CollectionItem[]> | null = null
 let allArticlesPromise: Promise<CollectionArticle[]> | null = null
@@ -58,10 +62,18 @@ function normalize(raw: unknown): CollectionItem[] {
 		}))
 }
 
-function parseTime(value?: string): number {
-	if (!value) return 0
-	const time = new Date(value).getTime()
-	return Number.isNaN(time) ? 0 : time
+function normalizeArticles(raw: unknown): CollectionArticle[] {
+	if (!Array.isArray(raw)) return []
+
+	return raw
+		.filter(
+			(item): item is CollectionArticle =>
+				!!item && typeof (item as CollectionArticle).slug === 'string' && typeof (item as CollectionArticle).collection === 'string'
+		)
+		.map(item => ({
+			...item,
+			tags: Array.isArray(item.tags) ? item.tags.filter((tag): tag is string => typeof tag === 'string') : []
+		}))
 }
 
 export function loadCollections(): Promise<CollectionItem[]> {
@@ -85,39 +97,29 @@ export async function isCollectionSlug(slug?: string): Promise<boolean> {
 }
 
 /**
- * 读取某个专栏成员文章的元信息（标题/日期/标签），数据来自各文章自己的 config.json，
- * 并按时间倒序排列——顺序完全由时间决定，不需要在 collections.json 里手工排序。
- */
-export async function loadCollectionArticles(collection: CollectionItem): Promise<CollectionArticle[]> {
-	const list = await Promise.all(
-		collection.articles.map(async slug => {
-			const config = await loadCollectionArticleConfig(collection.slug, slug)
-			return {
-				slug,
-				title: config.title || slug,
-				date: config.date,
-				tags: Array.isArray(config.tags) ? config.tags.filter((tag): tag is string => typeof tag === 'string') : [],
-				collection: collection.slug,
-				collectionTitle: collection.title
-			}
-		})
-	)
-
-	return list.sort((a, b) => parseTime(b.date) - parseTime(a.date))
-}
-
-/**
- * 读取**全部专栏**的成员文章并打平成一张表，供跨专栏检索使用。
- * 按时间倒序；模块级缓存，整个会话只加载一轮。
+ * 读取**全部专栏**的成员文章（按时间倒序）。
+ *
+ * 数据来自构建期生成的扁平索引 `public/blogs/collection-articles.json`——**1 个请求**就能拿到
+ * 所有专栏文章的标题/日期/标签/摘要/封面，替代了原先"每篇文章各请求一次 config.json"的做法。
+ * 模块级缓存，整个会话只加载一轮。
  */
 export function loadAllCollectionArticles(): Promise<CollectionArticle[]> {
 	if (!allArticlesPromise) {
-		allArticlesPromise = loadCollections()
-			.then(list => Promise.all(list.map(collection => loadCollectionArticles(collection))))
-			.then(groups => groups.flat().sort((a, b) => parseTime(b.date) - parseTime(a.date)))
+		allArticlesPromise = fetch(COLLECTION_ARTICLES_PATH, { cache: 'no-store' })
+			.then(res => (res.ok ? res.json() : []))
+			.then(normalizeArticles)
 			.catch(() => [])
 	}
 	return allArticlesPromise
+}
+
+/**
+ * 读取某个专栏的成员文章（按时间倒序）。
+ * 同样来自上面那份扁平索引（已在构建期按时间排好序，过滤即可保持顺序）。
+ */
+export async function loadCollectionArticles(collection: CollectionItem): Promise<CollectionArticle[]> {
+	const all = await loadAllCollectionArticles()
+	return all.filter(article => article.collection === collection.slug)
 }
 
 /** 专栏文章的稳定标识，用于点赞、已读等以字符串为 key 的场景 */
