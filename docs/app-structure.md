@@ -70,6 +70,8 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 - 专栏正文：`public/blogs/{collection}/index.md` + `cover.*`
 - 专栏文章：`public/blogs/{collection}/articles/{article}/`，每篇是一个**完整的普通文章目录**（`config.json` + `index.md`）
 - 渲染：专栏文章页与 `/blog/{slug}` **共用** `@/components/blog-preview` 的 `<BlogPreview>`，表现完全一致
+- 列表页布局：参照 `/projects`（双列卡片 `max-w-[1200px]`）
+- 列表页检索：跨全部专栏，**标题关键词**（留空不筛）+ **标签多选 AND**（标签由所有专栏文章汇总，含候选数量、会归零的标签置灰）
 - 旧链接 `/blog/{collection}[/{article}]` 会自动重定向到 `/collections/...`
 
 详见 [docs/collections.md](collections.md)。

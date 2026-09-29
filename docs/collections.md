@@ -58,6 +58,25 @@ public/blogs/
 - **目录**：按各子文章 `config.json` 的 `date` 倒序串联（最新的在最前），每行与 `/blog` 列表一致：日期 · 时间线圆点 · 标题 · 右侧 tags 标签；已读的文章显示 `[已阅读]`
 - 专栏自身不再带 tags（标签只属于子文章）
 
+## 专栏列表页的检索
+
+`/collections` 顶部提供**跨全部专栏**的检索，两个条件同时生效：
+
+| 条件 | 行为 |
+|------|------|
+| 关键词 | 匹配子文章**标题**（含即命中，忽略大小写）；留空则不筛选 |
+| 标签 | 由**所有专栏文章**的 tags 汇总而成，可多选；多选时需**同时包含**（AND）；不选则不筛选 |
+
+交互细节：
+
+- 每个标签 chip 上的数字是「当前关键词 + 当前已选标签 + 该标签」下的候选命中数
+- 会让结果归零且未选中的标签会**置灰禁用**——这是 AND 语义下避免"点了就空"的关键
+- 未筛选时展示**专栏卡片网格**；一旦有筛选条件，切换为**文章结果列表**（日期 · 时间线 · 标题 · 所属专栏徽标 · tags）
+- 数据来自 `loadAllCollectionArticles()`：并行读取全部专栏文章的 `config.json` 后打平，模块级缓存，整个会话只加载一轮
+- 纯前端内存过滤，无后端与索引服务；**筛选状态不写入 URL**（刷新即重置）
+
+数据量增长后（大致超过 50 篇）若请求数成为负担，可改为构建期生成扁平索引（仿照 `public/blogs/index.json`）后再检索。
+
 ## 新增一篇专栏文章
 
 1. 新建目录 `public/blogs/{collection}/articles/{article-slug}/`
@@ -106,9 +125,10 @@ public/blogs/
 | 文件 | 作用 |
 |------|------|
 | `public/blogs/collections.json` | 专栏注册表 |
-| `src/lib/collections.ts` | 注册表读取与缓存、专栏文章 key |
-| `src/lib/load-blog.ts` | `loadBlog`（普通文章）/ `loadCollectionArticle`（专栏文章） |
-| `src/app/collections/page.tsx` | 专栏列表 |
+| `src/lib/collections.ts` | 注册表读取与缓存、专栏文章 key、跨专栏汇总与检索（`loadAllCollectionArticles` / `collectTags` / `filterArticles` / `collectTagOptions`） |
+| `src/lib/load-blog.ts` | `loadBlog`（普通文章）/ `loadCollectionArticle`（专栏文章）/ `loadCollectionArticleConfig`（只读元信息） |
+| `src/app/collections/page.tsx` | 专栏列表 + 跨专栏检索（卡片网格 / 结果列表两种渲染） |
+| `src/app/collections/components/collection-search.tsx` | 检索控件：关键词输入 + 多选标签 chips + 命中数 |
 | `src/app/collections/[collection]/page.tsx` | 专栏主页 |
 | `src/app/collections/[collection]/[article]/page.tsx` | 专栏文章正文 |
-| `src/components/nav-card.tsx` | 首页 GENERAL 导航中的「专栏」入口 |
+| `src/components/nav-card.tsx` | 首页 GENERAL 导航中的「我的专栏」入口 |
