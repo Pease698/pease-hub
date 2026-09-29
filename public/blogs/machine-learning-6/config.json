@@ -3,10 +3,8 @@
   "tags": [
     "机器学习",
     "集成学习",
-    "AdaBoost",
-    "Gradient Boosting",
-    "Bagging",
-    "随机森林"
+    "Boosting",
+    "Bagging"
   ],
   "date": "2026-08-24T11:43",
   "extras": {

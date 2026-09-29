@@ -10,9 +10,16 @@
  * 专栏文章：public/blogs/{collection}/articles/{article}/(config.json + index.md)
  *
  * 注册表在模块级缓存，整个会话只请求一次。
+ * 检索相关函数复用 @/lib/tag-filter，与普通文章搜索共用同一套算法（数据源各自独立）。
  */
 
 import { loadCollectionArticleConfig } from '@/lib/load-blog'
+
+export type { TagOption } from '@/lib/tag-filter'
+
+// 检索：与普通文章搜索共用实现，见 src/lib/tag-filter.ts
+export { collectTags, collectTagOptions } from '@/lib/tag-filter'
+export { filterByKeywordAndTags as filterArticles } from '@/lib/tag-filter'
 
 export type CollectionItem = {
 	slug: string
@@ -33,12 +40,6 @@ export type CollectionArticle = {
 	collection: string
 	/** 所属专栏标题 */
 	collectionTitle: string
-}
-
-/** 标签汇总项：标签名 + 在给定条件下的命中数 */
-export type TagOption = {
-	tag: string
-	count: number
 }
 
 export const COLLECTIONS_PATH = '/blogs/collections.json'
@@ -117,51 +118,6 @@ export function loadAllCollectionArticles(): Promise<CollectionArticle[]> {
 			.catch(() => [])
 	}
 	return allArticlesPromise
-}
-
-/** 汇总所有文章标签（去重 + 计数），按数量倒序、同数量按字典序 */
-export function collectTags(articles: CollectionArticle[]): TagOption[] {
-	const counter = new Map<string, number>()
-	for (const article of articles) {
-		for (const tag of article.tags) {
-			counter.set(tag, (counter.get(tag) ?? 0) + 1)
-		}
-	}
-
-	return Array.from(counter, ([tag, count]) => ({ tag, count })).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag))
-}
-
-/**
- * 检索：
- *   - 关键词为空 → 不按标题筛选（仅 trim 后比较，忽略大小写）
- *   - 未选标签 → 不按标签筛选
- *   - 选了多个标签 → 需**同时包含**（AND）
- * 两个条件同时生效。
- */
-export function filterArticles(articles: CollectionArticle[], keyword: string, selectedTags: Set<string>): CollectionArticle[] {
-	const query = keyword.trim().toLowerCase()
-	if (!query && selectedTags.size === 0) return articles
-
-	return articles.filter(article => {
-		if (query && !article.title.toLowerCase().includes(query)) return false
-		for (const tag of selectedTags) {
-			if (!article.tags.includes(tag)) return false
-		}
-		return true
-	})
-}
-
-/**
- * 计算各标签在当前条件下的候选命中数（关键词 + 已选标签 + 该标签），
- * 用于在 chip 上显示数量、并把"加了就会归零"的标签置灰。
- * 顺序沿用全局热度排序，避免选择时位置跳动。
- */
-export function collectTagOptions(articles: CollectionArticle[], keyword: string, selectedTags: Set<string>): TagOption[] {
-	return collectTags(articles).map(({ tag }) => {
-		const candidate = new Set(selectedTags)
-		candidate.add(tag)
-		return { tag, count: filterArticles(articles, keyword, candidate).length }
-	})
 }
 
 /** 专栏文章的稳定标识，用于点赞、已读等以字符串为 key 的场景 */

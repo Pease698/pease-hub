@@ -19,16 +19,19 @@ import { useConfigStore } from '@/app/(home)/stores/config-store'
 import { readFileAsText } from '@/lib/file-utils'
 import { cn } from '@/lib/utils'
 import { saveBlogEdits } from './services/save-blog-edits'
-import { Check } from 'lucide-react'
+import { Check, Search } from 'lucide-react'
 import { BlogCoverHoverPreview, useBlogCoverHover } from './components/blog-cover-hover'
 import { CategoryModal } from './components/category-modal'
+import { filterByKeywordAndTags } from '@/lib/tag-filter'
+import { TagSearchControls } from '@/components/tag-search-controls'
+import { ArticleResultList, type ArticleResultItem } from '@/components/article-result-list'
 
 type DisplayMode = 'day' | 'week' | 'month' | 'year' | 'category'
 
 export default function BlogPage() {
 	const { items, loading } = useBlogIndex()
 	const { categories: categoriesFromServer } = useCategories()
-	const { isRead } = useReadArticles()
+	const { isRead, readArticles } = useReadArticles()
 	const { isAuth, setPrivateKey } = useAuthStore()
 	const { siteContent } = useConfigStore()
 	const hideEditButton = siteContent.hideEditButton ?? false
@@ -43,6 +46,11 @@ export default function BlogPage() {
 	const [categoryModalOpen, setCategoryModalOpen] = useState(false)
 	const [categoryList, setCategoryList] = useState<string[]>([])
 	const [newCategory, setNewCategory] = useState('')
+
+	// 搜索态：仅检索普通文章（数据来自 index.json，页面已加载，无额外请求），与专栏搜索互不干涉
+	const [searchMode, setSearchMode] = useState(false)
+	const [keyword, setKeyword] = useState('')
+	const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
 
 	const { cancelCoverPreview, onCoverLinkMouseEnter, hoverCoverPreview, mousePosition } = useBlogCoverHover(editMode)
 
@@ -299,6 +307,39 @@ export default function BlogPage() {
 		[setPrivateKey]
 	)
 
+	const searchFiltered = useMemo(() => filterByKeywordAndTags(items, keyword, selectedTags), [items, keyword, selectedTags])
+
+	const searchResults = useMemo<ArticleResultItem[]>(
+		() =>
+			searchFiltered.map(item => ({
+				key: item.slug,
+				href: `/blog/${item.slug}`,
+				title: item.title || item.slug,
+				date: item.date,
+				tags: item.tags || [],
+				read: isRead(item.slug)
+			})),
+		[searchFiltered, isRead, readArticles]
+	)
+
+	const exitSearch = useCallback(() => {
+		setSearchMode(false)
+		setKeyword('')
+		setSelectedTags(new Set())
+	}, [])
+
+	useEffect(() => {
+		if (!searchMode) return
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === 'Escape') exitSearch()
+		}
+
+		window.addEventListener('keydown', handleKeyDown)
+		return () => {
+			window.removeEventListener('keydown', handleKeyDown)
+		}
+	}, [searchMode, exitSearch])
+
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (!editMode && (e.ctrlKey || e.metaKey) && e.key === ',') {
@@ -328,7 +369,7 @@ export default function BlogPage() {
 			/>
 
 			<div className='flex flex-col items-center justify-center gap-6 px-6 pt-24 max-sm:pt-24'>
-				{items.length > 0 && (
+				{items.length > 0 && !searchMode && (
 					<motion.div
 						initial={{ opacity: 0, scale: 0.6 }}
 						animate={{ opacity: 1, scale: 1 }}
@@ -352,12 +393,70 @@ export default function BlogPage() {
 								{option.label}
 							</motion.button>
 						))}
+
+						{/* 搜索入口：与日/周/月/年平级；编辑模式下不显示 */}
+						{!editMode && (
+							<>
+								<div className='bg-secondary/20 mx-1 h-4 w-px' />
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.95 }}
+									onClick={() => setSearchMode(true)}
+									aria-label='搜索文章'
+									className='btn-rounded text-secondary hover:text-brand p-2 transition-all hover:bg-white/60'>
+									<Search className='h-4 w-4' />
+								</motion.button>
+							</>
+						)}
+					</motion.div>
+				)}
+
+				{searchMode && (
+					<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='flex w-full flex-col items-center max-sm:hidden'>
+						<div className='w-full max-w-[840px]'>
+							<button
+								type='button'
+								onClick={exitSearch}
+								className='text-secondary hover:text-brand group mb-4 inline-flex items-center gap-2 text-sm transition-colors'>
+								<svg
+									xmlns='http://www.w3.org/2000/svg'
+									width='16'
+									height='16'
+									viewBox='0 0 24 24'
+									fill='none'
+									stroke='currentColor'
+									strokeWidth='2'
+									strokeLinecap='round'
+									strokeLinejoin='round'
+									className='transition-transform group-hover:-translate-x-0.5'>
+									<path d='m15 18-6-6 6-6' />
+								</svg>
+								返回分组列表
+							</button>
+						</div>
+
+						<div className='w-full max-w-[840px]'>
+							<TagSearchControls
+								items={items}
+								keyword={keyword}
+								onKeywordChange={setKeyword}
+								selectedTags={selectedTags}
+								onSelectedTagsChange={setSelectedTags}
+								resultCount={searchFiltered.length}
+								placeholder='搜索文章标题...'
+								autoFocus
+							/>
+						</div>
+
+						<motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='card relative w-full max-w-[840px]'>
+							<ArticleResultList items={searchResults} />
+						</motion.div>
 					</motion.div>
 				)}
 
 				{groupKeys.map((groupKey, index) => {
 					const group = groupedItems[groupKey]
-					if (!group) return null
+					if (searchMode || !group) return null
 
 					return (
 						<motion.div
@@ -474,7 +573,7 @@ export default function BlogPage() {
 			<motion.div
 				initial={{ opacity: 0, scale: 0.6 }}
 				animate={{ opacity: 1, scale: 1 }}
-				className='absolute top-4 right-6 flex items-center gap-3 max-sm:hidden'>
+				className={cn('absolute top-4 right-6 items-center gap-3 max-sm:hidden', searchMode ? 'hidden' : 'flex')}>
 				{editMode ? (
 					<>
 						{enableCategories && (

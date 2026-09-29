@@ -138,13 +138,14 @@ public/blogs/
 | 文件 | 作用 |
 |------|------|
 | `public/blogs/collections.json` | 专栏注册表 |
-| `src/lib/collections.ts` | 注册表读取与缓存、专栏文章 key、跨专栏汇总与检索（`loadAllCollectionArticles` / `collectTags` / `filterArticles` / `collectTagOptions`） |
+| `src/lib/collections.ts` | 注册表读取与缓存、专栏文章 key、跨专栏汇总；检索算法复用 `@/lib/tag-filter` |
 | `src/lib/load-blog.ts` | `loadBlog`（普通文章）/ `loadCollectionArticle`（专栏文章）/ `loadCollectionArticleConfig`（只读元信息） |
 | `src/app/collections/page.tsx` | 专栏列表（只加载注册表）+ 搜索入口 |
 | `src/app/collections/search/page.tsx` | 搜索页：进入时才加载全部文章与标签 |
 | `src/app/collections/components/collection-search-entry.tsx` | 搜索入口按钮（搜索框外观的链接） |
-| `src/app/collections/components/collection-search.tsx` | 检索控件：关键词输入 + 多选标签 chips + 命中数 |
-| `src/app/collections/components/collection-article-list.tsx` | 跨专栏结果行列表（含空状态） |
+| `src/lib/tag-filter.ts` | 检索纯算法（**与文章搜索共用**）：`collectTags` / `filterByKeywordAndTags` / `collectTagOptions` |
+| `src/components/tag-search-controls.tsx` | 检索控件（**与文章搜索共用**）：关键词输入 + 多选标签 chips + 命中数 |
+| `src/components/article-result-list.tsx` | 结果行列表（**与文章搜索共用**，专栏传 `badge` 显示专栏名） |
 | `src/app/collections/[collection]/page.tsx` | 专栏主页 |
 | `src/app/collections/[collection]/[article]/page.tsx` | 专栏文章正文 |
 | `src/components/nav-card.tsx` | 首页 GENERAL 导航中的「我的专栏」入口 |

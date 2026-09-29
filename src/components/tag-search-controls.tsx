@@ -2,31 +2,37 @@
 
 import { useMemo } from 'react'
 import { cn } from '@/lib/utils'
-import { collectTagOptions, type CollectionArticle } from '@/lib/collections'
+import { collectTagOptions, type Taggable } from '@/lib/tag-filter'
 
-type CollectionSearchProps = {
-	articles: CollectionArticle[]
+type TagSearchControlsProps<T extends Taggable> = {
+	items: T[]
 	keyword: string
 	onKeywordChange: (value: string) => void
 	selectedTags: Set<string>
 	onSelectedTagsChange: (next: Set<string>) => void
-	/** 当前命中数量，由页面统一计算后传入 */
+	/** 当前命中数量，由调用方统一计算后传入 */
 	resultCount: number
-	/** 进入搜索页时自动聚焦输入框 */
+	placeholder?: string
+	/** 进入搜索态时自动聚焦输入框 */
 	autoFocus?: boolean
 }
 
-export function CollectionSearch({
-	articles,
+/**
+ * 检索控件：关键词输入 + 多选标签 chips（AND）+ 命中数。
+ * 专栏搜索与普通文章搜索共用；数据源由调用方通过 items 决定。
+ */
+export function TagSearchControls<T extends Taggable>({
+	items,
 	keyword,
 	onKeywordChange,
 	selectedTags,
 	onSelectedTagsChange,
 	resultCount,
+	placeholder = '搜索标题...',
 	autoFocus = false
-}: CollectionSearchProps) {
+}: TagSearchControlsProps<T>) {
 	// 各标签在"当前关键词 + 当前已选标签 + 该标签"下的候选命中数
-	const tagOptions = useMemo(() => collectTagOptions(articles, keyword, selectedTags), [articles, keyword, selectedTags])
+	const tagOptions = useMemo(() => collectTagOptions(items, keyword, selectedTags), [items, keyword, selectedTags])
 
 	const toggleTag = (tag: string) => {
 		const next = new Set(selectedTags)
@@ -47,7 +53,7 @@ export function CollectionSearch({
 				value={keyword}
 				autoFocus={autoFocus}
 				onChange={e => onKeywordChange(e.target.value)}
-				placeholder='搜索专栏文章标题...'
+				placeholder={placeholder}
 				className='bg-card focus:border-brand/60 mx-auto block w-full max-w-md rounded-lg border px-4 py-2 text-sm transition-colors focus:outline-none'
 			/>
 

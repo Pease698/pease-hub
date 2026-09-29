@@ -14,7 +14,7 @@ export function CollectionSearchEntry({ href = '/collections/search' }: { href?:
 			href={href}
 			className='bg-card text-secondary hover:border-brand/40 hover:text-brand mb-8 flex w-full max-w-md items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors'>
 			<Search className='h-4 w-4 shrink-0' />
-			<span>搜索专栏文章、标签…</span>
+			<span>点击搜索专栏文章、标签…</span>
 		</Link>
 	)
 }

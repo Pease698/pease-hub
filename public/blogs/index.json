@@ -60,7 +60,6 @@
     "tags": [
       "机器学习",
       "感知机",
-      "多层感知机",
       "BP 算法"
     ],
     "date": "2026-08-20T10:51",
@@ -106,10 +105,8 @@
     "tags": [
       "机器学习",
       "集成学习",
-      "AdaBoost",
-      "Gradient Boosting",
-      "Bagging",
-      "随机森林"
+      "Boosting",
+      "Bagging"
     ],
     "date": "2026-08-24T11:43",
     "summary": "西瓜书第八章集成学习的学习笔记，包括 AdaBoost, Gradient Boosting, Bagging, 随机森林等",

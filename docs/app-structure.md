@@ -40,6 +40,7 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 #### blog/ — 博客
 
 - 列表页按日/周/月/年/分类分组，支持编辑模式（批量删除、管理分类）
+- 列表页搜索：时间维度胶囊右侧的搜索图标，**同页切换**为搜索态（标题关键词 + 标签多选 AND，仅普通文章，零额外请求；与专栏搜索各自独立）
 - 详情页加载 `config.json` + `index.md`，Markdown 渲染 + 目录导航 + 封面上传
 - 数据源：`public/blogs/` + `useBlogIndex()` SWR hook
 - 详见 [docs/blog-article.md](blog-article.md)
