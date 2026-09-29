@@ -58,9 +58,22 @@ public/blogs/
 - **目录**：按各子文章 `config.json` 的 `date` 倒序串联（最新的在最前），每行与 `/blog` 列表一致：日期 · 时间线圆点 · 标题 · 右侧 tags 标签；已读的文章显示 `[已阅读]`
 - 专栏自身不再带 tags（标签只属于子文章）
 
-## 专栏列表页的检索
+## 检索（搜索入口 + 独立搜索页）
 
-`/collections` 顶部提供**跨全部专栏**的检索，两个条件同时生效：
+检索**不在**专栏列表页上直接展开，而是分成两步，目的是让首屏不为"可能用不到的标签云"付出代价：
+
+| 路由 | 加载的数据 | 说明 |
+|------|-----------|------|
+| `/collections` | 只加载 `collections.json`（**1 个请求**） | 专栏卡片网格 + 一个搜索框样式的**入口按钮** |
+| `/collections/search` | 进入本页才 `loadAllCollectionArticles()`（并行读取每篇文章的 `config.json`） | 搜索态：全部标签 + **默认列出全部文章**作为初始结果 |
+
+- 入口按钮是个链接（不是真实 `<input>`）——能聚焦却打不了字的输入框容易被误认为坏了
+- 入口是否显示，只依据 `collections.json` 里各专栏的 `articles` 总数判断，**不触发额外请求**
+- 进入搜索页后：自动聚焦输入框；`Esc` 或左上角「返回专栏列表」可退出
+- `loadAllCollectionArticles()` 有**模块级缓存**，第二次进入搜索页不会再发请求
+- **注意**：`/collections/search` 是静态路由，会**遮蔽同名专栏**——请勿把专栏 slug 命名为 `search`
+
+检索条件两个，同时生效：
 
 | 条件 | 行为 |
 |------|------|
@@ -71,9 +84,9 @@ public/blogs/
 
 - 每个标签 chip 上的数字是「当前关键词 + 当前已选标签 + 该标签」下的候选命中数
 - 会让结果归零且未选中的标签会**置灰禁用**——这是 AND 语义下避免"点了就空"的关键
-- 未筛选时展示**专栏卡片网格**；一旦有筛选条件，切换为**文章结果列表**（日期 · 时间线 · 标题 · 所属专栏徽标 · tags）
-- 数据来自 `loadAllCollectionArticles()`：并行读取全部专栏文章的 `config.json` 后打平，模块级缓存，整个会话只加载一轮
-- 纯前端内存过滤，无后端与索引服务；**筛选状态不写入 URL**（刷新即重置）
+- 结果列表：日期 · 时间线 · 标题 · 所属专栏徽标 · tags，整行可点，已读显示 `[已阅读]`
+- 计数行常显：未筛选时「共 N 篇」，有筛选时「命中 N 篇」
+- 纯前端内存过滤，无后端与索引服务；**筛选条件不写入 URL**（刷新即回到无筛选、仍列出全部文章）
 
 数据量增长后（大致超过 50 篇）若请求数成为负担，可改为构建期生成扁平索引（仿照 `public/blogs/index.json`）后再检索。
 
@@ -127,8 +140,11 @@ public/blogs/
 | `public/blogs/collections.json` | 专栏注册表 |
 | `src/lib/collections.ts` | 注册表读取与缓存、专栏文章 key、跨专栏汇总与检索（`loadAllCollectionArticles` / `collectTags` / `filterArticles` / `collectTagOptions`） |
 | `src/lib/load-blog.ts` | `loadBlog`（普通文章）/ `loadCollectionArticle`（专栏文章）/ `loadCollectionArticleConfig`（只读元信息） |
-| `src/app/collections/page.tsx` | 专栏列表 + 跨专栏检索（卡片网格 / 结果列表两种渲染） |
+| `src/app/collections/page.tsx` | 专栏列表（只加载注册表）+ 搜索入口 |
+| `src/app/collections/search/page.tsx` | 搜索页：进入时才加载全部文章与标签 |
+| `src/app/collections/components/collection-search-entry.tsx` | 搜索入口按钮（搜索框外观的链接） |
 | `src/app/collections/components/collection-search.tsx` | 检索控件：关键词输入 + 多选标签 chips + 命中数 |
+| `src/app/collections/components/collection-article-list.tsx` | 跨专栏结果行列表（含空状态） |
 | `src/app/collections/[collection]/page.tsx` | 专栏主页 |
 | `src/app/collections/[collection]/[article]/page.tsx` | 专栏文章正文 |
 | `src/components/nav-card.tsx` | 首页 GENERAL 导航中的「我的专栏」入口 |

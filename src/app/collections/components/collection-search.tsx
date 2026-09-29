@@ -12,9 +12,19 @@ type CollectionSearchProps = {
 	onSelectedTagsChange: (next: Set<string>) => void
 	/** 当前命中数量，由页面统一计算后传入 */
 	resultCount: number
+	/** 进入搜索页时自动聚焦输入框 */
+	autoFocus?: boolean
 }
 
-export function CollectionSearch({ articles, keyword, onKeywordChange, selectedTags, onSelectedTagsChange, resultCount }: CollectionSearchProps) {
+export function CollectionSearch({
+	articles,
+	keyword,
+	onKeywordChange,
+	selectedTags,
+	onSelectedTagsChange,
+	resultCount,
+	autoFocus = false
+}: CollectionSearchProps) {
 	// 各标签在"当前关键词 + 当前已选标签 + 该标签"下的候选命中数
 	const tagOptions = useMemo(() => collectTagOptions(articles, keyword, selectedTags), [articles, keyword, selectedTags])
 
@@ -35,6 +45,7 @@ export function CollectionSearch({ articles, keyword, onKeywordChange, selectedT
 			<input
 				type='text'
 				value={keyword}
+				autoFocus={autoFocus}
 				onChange={e => onKeywordChange(e.target.value)}
 				placeholder='搜索专栏文章标题...'
 				className='bg-card focus:border-brand/60 mx-auto block w-full max-w-md rounded-lg border px-4 py-2 text-sm transition-colors focus:outline-none'
@@ -79,9 +90,9 @@ export function CollectionSearch({ articles, keyword, onKeywordChange, selectedT
 				</div>
 			)}
 
-			{hasFilter && (
-				<div className='text-secondary flex items-center justify-center gap-3 text-sm'>
-					<span>命中 {resultCount} 篇</span>
+			<div className='text-secondary flex items-center justify-center gap-3 text-sm'>
+				<span>{hasFilter ? `命中 ${resultCount} 篇` : `共 ${resultCount} 篇`}</span>
+				{hasFilter && (
 					<button
 						type='button'
 						onClick={() => {
@@ -91,8 +102,8 @@ export function CollectionSearch({ articles, keyword, onKeywordChange, selectedT
 						className='hover:text-brand underline-offset-2 transition-colors hover:underline'>
 						清空筛选
 					</button>
-				</div>
-			)}
+				)}
+			</div>
 		</div>
 	)
 }

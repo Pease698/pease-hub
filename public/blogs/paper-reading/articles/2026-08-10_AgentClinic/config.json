@@ -1,6 +1,6 @@
 {
 	"title": "AgentClinic测试框架",
-	"tags": ["医学多智能体", "benchmark"],
+	"tags": ["论文", "医学多智能体", "benchmark"],
 	"date": "2026-08-10",
 	"summary": "AgentClinic 医学多智能体 benchmark 论文笔记：在模拟临床环境中评测 AI 的问诊与工具调用能力。"
 }

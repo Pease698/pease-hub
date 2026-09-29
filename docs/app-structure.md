@@ -12,6 +12,7 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 | [blog/](src/app/blog/) | `/blog` | 博客列表 | `public/blogs/index.json` |
 | [blog/[id]/](src/app/blog/%5Bid%5D/) | `/blog/{slug}` | 博客详情 | `public/blogs/{slug}/` |
 | [collections/](src/app/collections/) | `/collections` | 专栏列表 | `public/blogs/collections.json` |
+| [collections/search/](src/app/collections/search/) | `/collections/search` | 跨专栏检索 | 各专栏文章 `config.json` |
 | [collections/[collection]/](src/app/collections/%5Bcollection%5D/) | `/collections/{collection}` | 专栏主页 | `public/blogs/{collection}/index.md` |
 | [collections/[collection]/[article]/](src/app/collections/%5Bcollection%5D/%5Barticle%5D/) | `/collections/{collection}/{article}` | 专栏文章 | `public/blogs/{collection}/articles/{article}/` |
 | [write/](src/app/write/) | `/write` | 文章编辑器 | — |
@@ -71,7 +72,8 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 - 专栏文章：`public/blogs/{collection}/articles/{article}/`，每篇是一个**完整的普通文章目录**（`config.json` + `index.md`）
 - 渲染：专栏文章页与 `/blog/{slug}` **共用** `@/components/blog-preview` 的 `<BlogPreview>`，表现完全一致
 - 列表页布局：参照 `/projects`（双列卡片 `max-w-[1200px]`）
-- 列表页检索：跨全部专栏，**标题关键词**（留空不筛）+ **标签多选 AND**（标签由所有专栏文章汇总，含候选数量、会归零的标签置灰）
+- 检索分两步：`/collections` 首屏**只加载注册表**（1 个请求）并显示搜索入口；进入 `/collections/search` 才加载全部文章与标签（跨专栏，**标题关键词**（留空不筛）+ **标签多选 AND**，含候选数量、会归零的标签置灰，默认列出全部文章）
+- 注意：`/collections/search` 为静态路由，会遮蔽同名专栏，勿将专栏 slug 命名为 `search`
 - 旧链接 `/blog/{collection}[/{article}]` 会自动重定向到 `/collections/...`
 
 详见 [docs/collections.md](collections.md)。
