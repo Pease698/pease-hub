@@ -3,7 +3,8 @@ import path from 'node:path'
 
 import siteContent from '@/config/site-content.json'
 import blogIndex from '@/../public/blogs/index.json'
-import type { BlogIndexItem } from '@/app/blog/types'
+import collections from '@/../public/blogs/collections.json'
+import type { BlogConfig, BlogIndexItem } from '@/app/blog/types'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.yysuni.com'
 const FEED_PATH = '/rss.xml'
@@ -12,6 +13,27 @@ const FEED_URL = `${SITE_ORIGIN}${FEED_PATH}`
 const PUBLIC_DIR = path.join(process.cwd(), 'public')
 
 const blogs = blogIndex as BlogIndexItem[]
+
+type CollectionRegistryItem = {
+	slug: string
+	title: string
+	summary?: string
+	cover?: string
+	date?: string
+	articles?: string[]
+}
+
+const collectionList = collections as CollectionRegistryItem[]
+
+/** 专栏文章的元信息来自各自的 config.json，与页面渲染保持同一数据源 */
+const readArticleConfig = (collectionSlug: string, articleSlug: string): BlogConfig => {
+	try {
+		const file = path.join(PUBLIC_DIR, 'blogs', collectionSlug, 'articles', articleSlug, 'config.json')
+		return JSON.parse(fs.readFileSync(file, 'utf8')) as BlogConfig
+	} catch {
+		return {}
+	}
+}
 
 const escapeXml = (value: string): string =>
 	value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;')
@@ -62,11 +84,10 @@ const buildEnclosure = (cover?: string): string | null => {
 	return `<enclosure url="${escapeXml(absoluteUrl)}" type="${type}" length="${length}" />`
 }
 
-const serializeItem = (item: BlogIndexItem): string => {
-	const link = `${SITE_ORIGIN}/blog/${item.slug}`
+const serializeItem = (item: BlogIndexItem, link: string): string => {
 	const title = escapeXml(item.title || item.slug)
 	const description = wrapCdata(item.summary || '')
-	const pubDate = new Date(item.date).toUTCString()
+	const pubDate = item.date ? new Date(item.date).toUTCString() : new Date().toUTCString()
 	const categories = (item.tags || [])
 		.filter(Boolean)
 		.map(tag => `<category>${escapeXml(tag)}</category>`)
@@ -93,10 +114,28 @@ export function GET(): Response {
 	const title = siteContent.meta?.title || '2025 Blog'
 	const description = siteContent.meta?.description || 'Latest updates from 2025 Blog'
 
-	const items = blogs
-		.filter(item => item?.slug)
-		.map(serializeItem)
-		.join('')
+	const postItems = blogs.filter(item => item?.slug).map(item => serializeItem(item, `${SITE_ORIGIN}/blog/${item.slug}`))
+
+	// 专栏文章（标题/标签/日期取自各文章的 config.json）
+	const collectionArticleItems = collectionList
+		.filter(collection => Boolean(collection?.slug))
+		.flatMap(collection =>
+			(collection.articles ?? [])
+				.filter((articleSlug): articleSlug is string => typeof articleSlug === 'string' && Boolean(articleSlug))
+				.map(articleSlug => {
+					const config = readArticleConfig(collection.slug, articleSlug)
+					const item: BlogIndexItem = {
+						slug: `${collection.slug}/${articleSlug}`,
+						title: config.title || articleSlug,
+						tags: config.tags ?? [],
+						date: config.date || collection.date || '',
+						summary: config.summary
+					}
+					return serializeItem(item, `${SITE_ORIGIN}/collections/${collection.slug}/${articleSlug}`)
+				})
+		)
+
+	const items = [...postItems, ...collectionArticleItems].join('')
 
 	const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">

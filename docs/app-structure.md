@@ -11,6 +11,9 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 | [(home)/](src/app/(home)/) | `/` | 首页 | 配置文件 |
 | [blog/](src/app/blog/) | `/blog` | 博客列表 | `public/blogs/index.json` |
 | [blog/[id]/](src/app/blog/%5Bid%5D/) | `/blog/{slug}` | 博客详情 | `public/blogs/{slug}/` |
+| [collections/](src/app/collections/) | `/collections` | 专栏列表 | `public/blogs/collections.json` |
+| [collections/[collection]/](src/app/collections/%5Bcollection%5D/) | `/collections/{collection}` | 专栏主页 | `public/blogs/{collection}/index.md` |
+| [collections/[collection]/[article]/](src/app/collections/%5Bcollection%5D/%5Barticle%5D/) | `/collections/{collection}/{article}` | 专栏文章 | `public/blogs/{collection}/articles/{article}/` |
 | [write/](src/app/write/) | `/write` | 文章编辑器 | — |
 | [write/[slug]/](src/app/write/%5Bslug%5D/) | `/write/{slug}` | 编辑文章 | 加载已有文章 |
 | [share/](src/app/share/) | `/share` | 分享/链接收藏 | `src/app/share/list.json` |
@@ -54,6 +57,22 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 - 状态管理：`config-store.ts`（卡片位置、样式、站点内容）
 - 配置保存通过 `push-site-content.ts` 写入 GitHub
 - 详见 [docs/app/home-page.md](home-page.md)
+
+---
+
+### 专栏（collections/）
+
+用于**长期维护、持续追加、非时间线**的系列内容（论文阅读汇总、leetcode 刷题记录等），与 `/blog` 的"近期文章"时间流分开，通过首页 GENERAL 导航的「我的专栏」进入。
+
+> 站内显示名为「我的专栏」，代码与 URL 仍沿用 `collections`（`/collections`、`collections.json`、`CollectionItem` 等），二者是同一概念。
+
+- 注册表：`public/blogs/collections.json`（专栏元信息 + 成员文章 slug，展示顺序按各文章 `config.json` 的时间倒序）
+- 专栏正文：`public/blogs/{collection}/index.md` + `cover.*`
+- 专栏文章：`public/blogs/{collection}/articles/{article}/`，每篇是一个**完整的普通文章目录**（`config.json` + `index.md`）
+- 渲染：专栏文章页与 `/blog/{slug}` **共用** `@/components/blog-preview` 的 `<BlogPreview>`，表现完全一致
+- 旧链接 `/blog/{collection}[/{article}]` 会自动重定向到 `/collections/...`
+
+详见 [docs/collections.md](collections.md)。
 
 ---
 
@@ -244,6 +263,6 @@ export const list = [
 | [consts.ts](src/consts.ts) | 全局常量（GitHub 配置、动画延迟、卡片间距等） |
 | [hooks/](src/hooks/) | 自定义 Hooks（`use-blog-index`、`use-auth`、`use-markdown-render`、`use-read-articles` 等） |
 | [layout/](src/layout/) | 布局相关组件（雪花背景、导航栏等） |
-| [lib/](src/lib/) | 核心工具库（GitHub API 客户端、Markdown 渲染器、认证、加密、文件工具） |
+| [lib/](src/lib/) | 核心工具库（GitHub API 客户端、Markdown 渲染器、认证、加密、文件工具、专栏注册表 `collections.ts`） |
 | [styles/](src/styles/) | 全局样式（CSS 文件） |
 | [svgs/](src/svgs/) | SVG React 组件（通过 `@svgr/webpack` 导入 `.svg` 文件自动转换为组件） |

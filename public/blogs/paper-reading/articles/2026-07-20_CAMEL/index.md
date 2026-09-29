@@ -16,7 +16,7 @@
 
 ### 主要内容
 
-![](/blogs/paper-reading/extras/CAMEL_pic/CAMEL_workflow.png)
+![](/blogs/paper-reading/articles/2026-07-20_CAMEL/pic/CAMEL_workflow.png)
 
 文章提出了一个有角色扮演的多智能体系统，主要包含四个智能体：
 1. Task Specifier

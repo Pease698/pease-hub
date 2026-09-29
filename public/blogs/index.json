@@ -28,32 +28,6 @@
     "category": "笔记"
   },
   {
-    "slug": "paper-reading",
-    "title": "论文阅读汇总",
-    "tags": [
-      "论文",
-      "医学多智能体"
-    ],
-    "date": "2026-07-20T15:20",
-    "summary": "对有价值的文章进行记录，方便后续查阅和参考",
-    "cover": "/blogs/paper-reading/cover.jpeg",
-    "hidden": false,
-    "category": "合集"
-  },
-  {
-    "slug": "leetcode",
-    "title": "leetcode刷题记录",
-    "tags": [
-      "leetcode",
-      "算法"
-    ],
-    "date": "2026-08-01T22:35",
-    "summary": "记录leetcode刷题过程，方便后续查阅和复习",
-    "cover": "/blogs/leetcode/cover.jpg",
-    "hidden": false,
-    "category": "合集"
-  },
-  {
     "slug": "machine-learning-1",
     "title": "机器学习-1 线性模型",
     "tags": [

@@ -25,6 +25,7 @@ pnpm run build:cf && pnpm run deploy
 
 - [源码结构](docs/app-structure.md)
 - [博客文章系统](docs/blog-article.md)
+- [专栏系统](docs/collections.md)
 - [首页详解](docs/home-page.md)
 - [图片资源](docs/images.md)
 

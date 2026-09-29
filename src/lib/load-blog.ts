@@ -10,17 +10,16 @@ export type LoadedBlog = {
 }
 
 /**
- * Load blog data from public/blogs/{slug}
- * Used by both view page and edit page
+ * Load blog data from a public directory that contains config.json + index.md
  */
-export async function loadBlog(slug: string): Promise<LoadedBlog> {
+async function loadFromDir(dir: string, slug: string): Promise<LoadedBlog> {
 	if (!slug) {
 		throw new Error('Slug is required')
 	}
 
 	// Load config.json
 	let config: BlogConfig = {}
-	const configRes = await fetch(`/blogs/${encodeURIComponent(slug)}/config.json`)
+	const configRes = await fetch(`${dir}/config.json`)
 	if (configRes.ok) {
 		try {
 			config = await configRes.json()
@@ -30,7 +29,7 @@ export async function loadBlog(slug: string): Promise<LoadedBlog> {
 	}
 
 	// Load index.md
-	const mdRes = await fetch(`/blogs/${encodeURIComponent(slug)}/index.md`)
+	const mdRes = await fetch(`${dir}/index.md`)
 	if (!mdRes.ok) {
 		throw new Error('Blog not found')
 	}
@@ -42,4 +41,46 @@ export async function loadBlog(slug: string): Promise<LoadedBlog> {
 		markdown,
 		cover: config.cover
 	}
+}
+
+/**
+ * Load a normal blog from public/blogs/{slug}
+ * Used by both view page and edit page
+ */
+export async function loadBlog(slug: string): Promise<LoadedBlog> {
+	if (!slug) {
+		throw new Error('Slug is required')
+	}
+
+	return loadFromDir(`/blogs/${encodeURIComponent(slug)}`, slug)
+}
+
+/**
+ * 只读取专栏文章的元信息（config.json，不拉正文），用于专栏目录页。
+ * 读不到时返回空对象，由调用方回退到 slug。
+ */
+export async function loadCollectionArticleConfig(collection: string, article: string): Promise<BlogConfig> {
+	if (!collection || !article) return {}
+
+	try {
+		const res = await fetch(`/blogs/${encodeURIComponent(collection)}/articles/${encodeURIComponent(article)}/config.json`)
+		if (!res.ok) return {}
+		return (await res.json()) as BlogConfig
+	} catch {
+		return {}
+	}
+}
+
+/**
+ * Load an article that belongs to a collection:
+ * public/blogs/{collection}/articles/{article}
+ *
+ * 注意：collection 与 article 必须分别编码，不能拼成一个带 `/` 的 slug 再编码。
+ */
+export async function loadCollectionArticle(collection: string, article: string): Promise<LoadedBlog> {
+	if (!collection || !article) {
+		throw new Error('Collection and article are required')
+	}
+
+	return loadFromDir(`/blogs/${encodeURIComponent(collection)}/articles/${encodeURIComponent(article)}`, `${collection}/${article}`)
 }

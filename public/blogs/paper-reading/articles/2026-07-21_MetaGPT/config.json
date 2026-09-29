@@ -1,0 +1,6 @@
+{
+	"title": "MetaGPT架构",
+	"tags": ["论文", "多智能体", "MetaGPT", "LLM"],
+	"date": "2026-07-21",
+	"summary": "MetaGPT 多智能体框架论文笔记：以 SOP 与元编程把自然语言需求转化为可执行流程。"
+}

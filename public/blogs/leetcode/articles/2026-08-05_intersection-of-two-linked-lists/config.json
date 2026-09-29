@@ -1,0 +1,6 @@
+{
+	"title": "leetcode-160 相交链表",
+	"tags": ["leetcode", "链表", "双指针"],
+	"date": "2026-08-05",
+	"summary": "leetcode 160 相交链表：双指针互相走完对方链表求交点。"
+}

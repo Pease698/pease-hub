@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import { motion } from 'motion/react'
 import { INIT_DELAY } from '@/consts'
 import type { BlogConfig } from '@/app/blog/types'
+import { isCollectionSlug } from '@/lib/collections'
 import { useMarkdownRender } from '@/hooks/use-markdown-render'
 import { useSize } from '@/hooks/use-size'
 import { getExtraComponent } from './registry'
@@ -105,6 +106,7 @@ function MarkdownContent({
 }
 
 function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: string }) {
+	const router = useRouter()
 	const [markdown, setMarkdown] = useState<string | null>(null)
 	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
@@ -124,7 +126,16 @@ function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: s
 					setError(null)
 				}
 			})
-			.catch(e => {
+			.catch(async e => {
+				if (cancelled) return
+
+				// 专栏内容已迁移：/blog/{collection}/{article} → /collections/{collection}/{article}
+				const target = extraName.split('/').map(encodeURIComponent).join('/')
+				if (await isCollectionSlug(blogSlug)) {
+					router.replace(`/collections/${encodeURIComponent(blogSlug)}/${target}`)
+					return
+				}
+
 				if (!cancelled) setError(e.message || '加载失败')
 			})
 			.finally(() => {
@@ -133,7 +144,7 @@ function MarkdownExtra({ blogSlug, extraName }: { blogSlug: string; extraName: s
 		return () => {
 			cancelled = true
 		}
-	}, [blogSlug, extraName])
+	}, [blogSlug, extraName, router])
 
 	useEffect(() => {
 		let cancelled = false

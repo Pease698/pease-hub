@@ -9,6 +9,8 @@ import { useCenterStore } from '@/hooks/use-center'
 import { CARD_SPACING } from '@/consts'
 import ScrollOutlineSVG from '@/svgs/scroll-outline.svg'
 import ScrollFilledSVG from '@/svgs/scroll-filled.svg'
+import CollectionsOutlineSVG from '@/svgs/collections-outline.svg'
+import CollectionsFilledSVG from '@/svgs/collections-filled.svg'
 import ProjectsFilledSVG from '@/svgs/projects-filled.svg'
 import ProjectsOutlineSVG from '@/svgs/projects-outline.svg'
 import AboutFilledSVG from '@/svgs/about-filled.svg'
@@ -30,6 +32,12 @@ const list = [
 		iconActive: ScrollFilledSVG,
 		label: '近期文章',
 		href: '/blog'
+	},
+	{
+		icon: CollectionsOutlineSVG,
+		iconActive: CollectionsFilledSVG,
+		label: '我的专栏',
+		href: '/collections'
 	},
 	{
 		icon: ProjectsOutlineSVG,
@@ -70,7 +78,8 @@ export default function NavCard() {
 	const hiCardStyles = cardStyles.hiCard
 
 	const activeIndex = useMemo(() => {
-		const index = list.findIndex(item => pathname === item.href)
+		// 精确匹配 + 子路径匹配（例如 /collections/paper-reading 也应高亮“专栏”）
+		const index = list.findIndex(item => pathname === item.href || pathname.startsWith(`${item.href}/`))
 		return index >= 0 ? index : undefined
 	}, [pathname])
 

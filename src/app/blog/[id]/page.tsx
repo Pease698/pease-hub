@@ -7,6 +7,7 @@ import { motion } from 'motion/react'
 import { BlogPreview } from '@/components/blog-preview'
 import { ScrollBar } from '@/components/scroll-bar'
 import { loadBlog, type BlogConfig } from '@/lib/load-blog'
+import { isCollectionSlug } from '@/lib/collections'
 import { useReadArticles } from '@/hooks/use-read-articles'
 import LiquidGrass from '@/components/liquid-grass'
 
@@ -24,8 +25,17 @@ export default function Page() {
 		let cancelled = false
 		async function run() {
 			if (!slug) return
+			let redirecting = false
 			try {
 				setLoading(true)
+
+				// 专栏已迁移到 /collections，旧链接 /blog/{collection} 重定向过去
+				if (await isCollectionSlug(slug)) {
+					redirecting = true
+					if (!cancelled) router.replace(`/collections/${encodeURIComponent(slug)}`)
+					return
+				}
+
 				const blogData = await loadBlog(slug)
 
 				if (!cancelled) {
@@ -36,14 +46,14 @@ export default function Page() {
 			} catch (e: any) {
 				if (!cancelled) setError(e?.message || '加载失败')
 			} finally {
-				if (!cancelled) setLoading(false)
+				if (!cancelled && !redirecting) setLoading(false)
 			}
 		}
 		run()
 		return () => {
 			cancelled = true
 		}
-	}, [slug, markAsRead])
+	}, [slug, markAsRead, router])
 
 	const title = useMemo(() => (blog?.config.title ? blog.config.title : slug), [blog?.config.title, slug])
 	const date = useMemo(() => dayjs(blog?.config.date).format('YYYY年 M月 D日'), [blog?.config.date])

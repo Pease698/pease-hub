@@ -4,7 +4,7 @@
 
 图示两个链表在节点 c1 开始相交：
 
-![](/blogs/leetcode/extras/pic/160_statement.png)
+![](/blogs/leetcode/articles/2026-08-05_intersection-of-two-linked-lists/pic/160_statement.png)
 
 题目数据保证整个链式结构中不存在环。注意，函数返回结果后，链表必须保持其原始结构。
 
@@ -18,7 +18,7 @@
 评测系统将根据这些输入创建链式数据结构，并将两个头节点 `headA` 和 `headB` 传递给你的程序。如果程序能够正确返回相交节点，那么你的解决方案将被视作正确答案。
 
 示例 1：
-> ![](/blogs/leetcode/extras/pic/160_example_1.png)
+> ![](/blogs/leetcode/articles/2026-08-05_intersection-of-two-linked-lists/pic/160_example_1.png)
 >
 > **输入**：`intersectVal = 8, listA = [4,1,8,4,5], listB = [5,6,1,8,4,5], skipA = 2, skipB = 3`
 > 
@@ -31,7 +31,7 @@
 > 请注意相交节点的值不为 1，因为在链表 A 和链表 B 之中值为 1 的节点 (A 中第二个节点和 B 中第三个节点) 是不同的节点。换句话说，它们在内存中指向两个不同的位置，而链表 A 和链表 B 中值为 8 的节点 (A 中第三个节点，B 中第四个节点) 在内存中指向相同的位置。
 
 示例 2：
-> ![](/blogs/leetcode/extras/pic/160_example_2.png)
+> ![](/blogs/leetcode/articles/2026-08-05_intersection-of-two-linked-lists/pic/160_example_2.png)
 >
 > **输入**：`intersectVal = 2, listA = [1,9,1,2,4], listB = [3,2,4], skipA = 3, skipB = 1`
 > 
@@ -42,7 +42,7 @@
 > 从各自的表头开始算起，链表 A 为 [1,9,1,2,4]，链表 B 为 [3,2,4]。在 A 中，相交节点前有 3 个节点；在 B 中，相交节点前有 1 个节点。
 
 示例 3：
-> ![](/blogs/leetcode/extras/pic/160_example_3.png)
+> ![](/blogs/leetcode/articles/2026-08-05_intersection-of-two-linked-lists/pic/160_example_3.png)
 >
 > **输入**：`intersectVal = 0, listA = [2,6,4], listB = [1,5], skipA = 3, skipB = 2`
 > 
@@ -82,7 +82,7 @@
 
 综合上述两个事实，若我们同时从头开始遍历 `listAB` 和 `listBA` 且 `listA` 和 `listB` 有交叉节点，则在完成遍历前必然会同时走到相同的节点上；反之若 `listA` 和 `listB` 没有交叉节点，则显然不可能走到相同节点上
 
-![](/blogs/leetcode/extras/pic/160_answer.png)
+![](/blogs/leetcode/articles/2026-08-05_intersection-of-two-linked-lists/pic/160_answer.png)
 
 更进一步，可以先让长链表走 $|m-n|$ 步，再让两个链表同时进行遍历，可以使用同样的思路进行理解（但实际上两种办法都是线性的时间复杂度，提升也不大了）
 

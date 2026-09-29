@@ -16,11 +16,11 @@
 
 ### 主要内容
 
-![](/blogs/paper-reading/extras/MetaGPT_pic/MetaGPT_workflow.png)
+![](/blogs/paper-reading/articles/2026-07-21_MetaGPT/pic/MetaGPT_workflow.png)
 
 **角色定义**：以代码生成为例，MetaGPT 根据标准 SOP 流程创建了产品经理、架构师、项目经理、工程师、质量保证工程师五个角色，每个角色通过配置文件定义自己的名称、概述、目标、约束、可调用工具、初始上下文等信息，并负责整个任务中的一个子任务
 
-![](/blogs/paper-reading/extras/MetaGPT_pic/MetaGPT_InforPool.png)
+![](/blogs/paper-reading/articles/2026-07-21_MetaGPT/pic/MetaGPT_InforPool.png)
 
 **标准输出**：各个智能体根据自己的角色完成对应的工作，同时将中间产出以结构化信息（如文档和图表）的形式进行输出和共享，以补充比自然语言文本更丰富的信息
 
@@ -39,7 +39,7 @@
 
 **可参考的内容**：
 1. 论文中该表格的标题行简写方法可以借鉴
-    ![](/blogs/paper-reading/extras/MetaGPT_pic/MetaGPT_table.png)
+    ![](/blogs/paper-reading/articles/2026-07-21_MetaGPT/pic/MetaGPT_table.png)
 
 2. [Pass@k](https://arxiv.org/abs/2107.03374) 基准需要了解；可以了解 [LangChain](https://arxiv.org/abs/2207.10397)、[ChatDev](https://arxiv.org/abs/2307.07924)、[AutoGPT](https://github.com/Significant-Gravitas/AutoGPT) 等相关内容；Related Work 中提到的其他论文也可以适当了解
 3. 论文中用到了 HumanEval、MBPP 测试集测试代码生成功能，同时提出了自己的测试集 SoftwareDev
