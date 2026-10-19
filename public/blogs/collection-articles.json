@@ -95,5 +95,19 @@
 		],
 		"summary": "CAMEL 多智能体框架论文笔记：通过角色扮演与对话驱动实现 LLM 智能体协作。",
 		"cover": "/blogs/paper-reading/cover.jpeg"
+	},
+	{
+		"collection": "paper-reading",
+		"collectionTitle": "论文阅读汇总",
+		"slug": "2026-10-19_MMedAgent",
+		"title": "MMedAgent",
+		"tags": [
+			"论文",
+			"医学多智能体",
+			"工具调用"
+		],
+		"date": "2026-10-19",
+		"summary": "MMedAgent 医学多智能体系统，通过专业工具调用方式提升系统能力",
+		"cover": "/blogs/paper-reading/cover.jpeg"
 	}
 ]
