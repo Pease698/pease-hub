@@ -5,7 +5,12 @@
 		"summary": "对有价值的文章进行记录，方便后续查阅和参考",
 		"cover": "/blogs/paper-reading/cover.jpeg",
 		"date": "2026-07-20T15:20",
-		"articles": ["2026-07-20_review2024", "2026-07-20_CAMEL", "2026-07-21_MetaGPT", "2026-08-10_AgentClinic"]
+		"articles": [
+			"2026-07-20_review2024",
+			"2026-07-20_CAMEL",
+			"2026-07-21_MetaGPT",
+			"2026-08-10_AgentClinic"
+		]
 	},
 	{
 		"slug": "leetcode",
@@ -13,6 +18,10 @@
 		"summary": "记录leetcode刷题过程，方便后续查阅和复习",
 		"cover": "/blogs/leetcode/cover.jpg",
 		"date": "2026-08-01T22:35",
-		"articles": ["2026-08-01_two-sum", "2026-08-05_intersection-of-two-linked-lists"]
+		"articles": [
+			"2026-08-01_two-sum",
+			"2026-08-05_intersection-of-two-linked-lists",
+			"2026-09-30_grouping-of-anagram"
+		]
 	}
 ]
