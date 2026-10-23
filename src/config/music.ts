@@ -28,5 +28,11 @@ export const MUSIC_TRACKS: MusicTrack[] = [
 		title: 'Merry Christmas Mr.Lawrence',
 		artist: '坂本龙一 / Jaques Morelenbaum / Judy Kang',
 		src: '/music/Merry-Christmas-Mr_Lawrence.mp3'
+	},
+	{
+		id: 'City-Of-Stars',
+		title: 'City Of Stars',
+		artist: 'Ryan Gosling / Emma Stone',
+		src: '/music/City-Of-Stars.mp3'
 	}
 ]
