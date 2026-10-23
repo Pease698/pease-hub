@@ -1,7 +1,10 @@
 'use client'
 
-import { Pause, Play, Repeat, Repeat1, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { Keyboard, Pause, Play, Repeat, Repeat1, SkipBack, SkipForward, Volume2, VolumeX } from 'lucide-react'
 import MusicProgress from '@/components/music-progress'
+import { ShortcutHelpDialog } from '@/components/music-shortcuts'
+import { useMusicHotkeys } from '@/hooks/use-music-hotkeys'
 import { useMusicStore } from '@/hooks/use-music'
 import { cn } from '@/lib/utils'
 import MusicSVG from '@/svgs/music.svg'
@@ -27,10 +30,20 @@ function MusicTime() {
 }
 
 export default function MusicPage() {
+	const [helpOpen, setHelpOpen] = useState(false)
+	const helpButtonRef = useRef<HTMLButtonElement>(null)
+	useMusicHotkeys({ enabled: !helpOpen })
+
+	const closeHelp = () => {
+		setHelpOpen(false)
+		requestAnimationFrame(() => helpButtonRef.current?.focus())
+	}
+
 	const tracks = useMusicStore(state => state.tracks)
 	const currentIndex = useMusicStore(state => state.currentIndex)
 	const isPlaying = useMusicStore(state => state.isPlaying)
 	const isReady = useMusicStore(state => state.isReady)
+	const hasInteracted = useMusicStore(state => state.hasInteracted)
 	const volume = useMusicStore(state => state.volume)
 	const muted = useMusicStore(state => state.muted)
 	const repeat = useMusicStore(state => state.repeat)
@@ -49,7 +62,21 @@ export default function MusicPage() {
 	return (
 		<div className='flex flex-col items-center px-6 pt-32 pb-12 max-sm:px-4'>
 			<div className='w-full max-w-[900px]'>
-				<h1 className='mb-6 text-3xl font-bold'>音乐</h1>
+				<div className='mb-6 flex items-center justify-between gap-4'>
+					<h1 className='text-3xl font-bold'>音乐</h1>
+
+					<button
+						ref={helpButtonRef}
+						type='button'
+						onClick={() => setHelpOpen(true)}
+						aria-label='查看音乐快捷键'
+						aria-haspopup='dialog'
+						aria-expanded={helpOpen}
+						className='text-secondary hover:text-primary hidden items-center gap-2 rounded-full border border-white/70 bg-white/40 px-3 py-1.5 text-xs backdrop-blur transition-colors sm:flex'>
+						<Keyboard className='size-4' />
+						快捷键
+					</button>
+				</div>
 
 				<div className='bg-card w-full rounded-[40px] border p-6 backdrop-blur sm:p-8'>
 					<div className='flex items-center gap-5'>
@@ -154,12 +181,14 @@ export default function MusicPage() {
 									<span className='text-secondary mt-0.5 block truncate text-xs'>{item.artist ?? '未知歌手'}</span>
 								</span>
 
-								{active && <span className='text-brand shrink-0 text-xs'>{isPlaying ? '正在播放' : '已暂停'}</span>}
+								{active && <span className='text-brand shrink-0 text-xs'>{isPlaying ? '正在播放' : hasInteracted ? '已暂停' : '待播放'}</span>}
 							</button>
 						)
 					})}
 				</div>
 			</div>
+
+			<ShortcutHelpDialog open={helpOpen} onClose={closeHelp} />
 		</div>
 	)
 }

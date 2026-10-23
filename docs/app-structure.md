@@ -245,6 +245,10 @@ export const MUSIC_TRACKS: MusicTrack[] = [
 
 播放器由 `src/hooks/use-music.ts` 统一管理（全局唯一 `HTMLAudioElement`），首页悬浮卡 `src/components/music-card.tsx` 与 `/music` 页面 `src/app/music/page.tsx` 共用同一份播放状态。
 
+播放状态（当前曲目、播放进度、音量、静音、循环模式）会写入 `localStorage`（`pease-hub:music-state`）。下次打开时优先恢复上次状态并保持暂停，只有没有有效存档或曲目已被删除时才随机选择初始曲目。
+
+`/music` 页面支持快捷键：`Space` 播放/暂停、`← / →` 快退/快进 5 秒、`Shift + ← / →` 上一首/下一首、`↑ / ↓` 音量 ±5%。首页悬浮卡在用户操作过音乐后会常驻，并支持切换循环模式。
+
 ---
 
 ### 纯前端工具页面

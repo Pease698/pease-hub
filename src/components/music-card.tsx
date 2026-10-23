@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Pause } from 'lucide-react'
+import { Pause, Repeat, Repeat1 } from 'lucide-react'
 import clsx from 'clsx'
 import Card from '@/components/card'
 import MusicProgress from '@/components/music-progress'
@@ -28,10 +28,14 @@ export default function MusicCard() {
 	const currentIndex = useMusicStore(state => state.currentIndex)
 	const isPlaying = useMusicStore(state => state.isPlaying)
 	const isReady = useMusicStore(state => state.isReady)
+	const hasInteracted = useMusicStore(state => state.hasInteracted)
+	const repeat = useMusicStore(state => state.repeat)
 	const toggle = useMusicStore(state => state.toggle)
+	const cycleRepeat = useMusicStore(state => state.cycleRepeat)
 
 	const track = tracks[currentIndex]
 	const isHomePage = pathname === '/'
+	const repeatLabel = repeat === 'one' ? '单曲循环' : repeat === 'all' ? '列表循环' : '不循环'
 
 	const position = useMemo(() => {
 		// 非首页时固定在视口右下角
@@ -54,8 +58,8 @@ export default function MusicCard() {
 	// 音乐页自带完整播放器，不再显示悬浮卡
 	if (pathname === '/music') return null
 
-	// 非首页且未播放时隐藏
-	if (!isHomePage && !isPlaying) return null
+	// 非首页：用户操作过音乐后常驻（暂停也显示），避免暂停后无法继续
+	if (!isHomePage && !hasInteracted) return null
 
 	return (
 		<HomeDraggableLayer cardKey='musicCard' x={x} y={y} width={styles.width} height={styles.height}>
@@ -93,6 +97,18 @@ export default function MusicCard() {
 						<MusicProgress compact />
 					</div>
 				</div>
+
+				<button
+					type='button'
+					onClick={cycleRepeat}
+					aria-label={repeatLabel}
+					title={repeatLabel}
+					className={clsx(
+						'flex size-7 shrink-0 items-center justify-center rounded-full transition-colors',
+						repeat === 'off' ? 'text-secondary hover:text-primary' : 'text-brand'
+					)}>
+					{repeat === 'one' ? <Repeat1 className='size-4' /> : <Repeat className='size-4' />}
+				</button>
 
 				<button
 					type='button'

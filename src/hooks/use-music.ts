@@ -7,13 +7,26 @@ import { getAudio } from '@/lib/music-player'
 
 export type RepeatMode = 'one' | 'all' | 'off'
 
-const VOLUME_STORAGE_KEY = 'pease-hub:music-volume'
+const STORAGE_KEY = 'pease-hub:music-state'
+const LEGACY_VOLUME_KEY = 'pease-hub:music-volume'
+const SAVE_INTERVAL = 5000
+
+type PersistedMusicState = {
+	v: 1
+	trackId: string
+	currentTime: number
+	volume: number
+	muted: boolean
+	repeat: RepeatMode
+	updatedAt: number
+}
 
 interface MusicStore {
 	tracks: MusicTrack[]
 	currentIndex: number
 	isPlaying: boolean
 	isReady: boolean
+	hasInteracted: boolean
 	currentTime: number
 	duration: number
 	volume: number
@@ -36,6 +49,70 @@ interface MusicStore {
 let initialized = false
 let eventsBound = false
 let playToken = 0
+let pendingSeek: number | null = null
+let lastSavedAt = 0
+
+function clamp(value: number, min: number, max: number) {
+	return Math.min(max, Math.max(min, value))
+}
+
+function readPersistedState(): PersistedMusicState | null {
+	if (typeof window === 'undefined') return null
+
+	try {
+		const raw = window.localStorage.getItem(STORAGE_KEY)
+		if (!raw) return null
+
+		const data = JSON.parse(raw) as Partial<PersistedMusicState>
+		if (data.v !== 1 || typeof data.trackId !== 'string') return null
+
+		return {
+			v: 1,
+			trackId: data.trackId,
+			currentTime: typeof data.currentTime === 'number' && Number.isFinite(data.currentTime) ? Math.max(0, data.currentTime) : 0,
+			volume: typeof data.volume === 'number' && Number.isFinite(data.volume) ? clamp(data.volume, 0, 1) : 0.8,
+			muted: Boolean(data.muted),
+			repeat: data.repeat === 'all' || data.repeat === 'off' ? data.repeat : 'one',
+			updatedAt: typeof data.updatedAt === 'number' ? data.updatedAt : 0
+		}
+	} catch {
+		return null
+	}
+}
+
+function savePersistedState(force = false) {
+	if (typeof window === 'undefined') return
+	if (pendingSeek !== null) return // 进度还没恢复完，避免用 0 覆盖存档
+	if (!useMusicStore.getState().hasInteracted) return
+
+	const now = Date.now()
+	if (!force && now - lastSavedAt < SAVE_INTERVAL) return
+
+	const { tracks, currentIndex, currentTime, volume, muted, repeat } = useMusicStore.getState()
+	const track = tracks[currentIndex]
+	if (!track) return
+
+	lastSavedAt = now
+
+	try {
+		const data: PersistedMusicState = {
+			v: 1,
+			trackId: track.id,
+			currentTime,
+			volume,
+			muted,
+			repeat,
+			updatedAt: now
+		}
+		window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+	} catch {
+		// localStorage 不可用时忽略
+	}
+}
+
+function markInteracted() {
+	useMusicStore.setState({ hasInteracted: true })
+}
 
 function safePlay() {
 	const token = ++playToken
@@ -53,21 +130,24 @@ function applyTrack(index: number, autoplay: boolean) {
 	if (!track) return
 
 	const audio = getAudio()
+	pendingSeek = null
 	audio.loop = repeat === 'one'
 
 	// 单曲循环 / 列表里只有一首时，下标不变也要能从头重播
 	if (index === currentIndex) {
 		audio.currentTime = 0
-		useMusicStore.setState({ currentTime: 0 })
+		useMusicStore.setState({ currentTime: 0, hasInteracted: true })
 		if (autoplay) safePlay()
 		else audio.pause()
+		savePersistedState(true)
 		return
 	}
 
 	audio.src = track.src
-	useMusicStore.setState({ currentIndex: index, currentTime: 0, duration: 0 })
+	useMusicStore.setState({ currentIndex: index, currentTime: 0, duration: 0, hasInteracted: true })
 
 	if (autoplay) safePlay()
+	savePersistedState(true)
 }
 
 function bindAudioEvents() {
@@ -76,10 +156,30 @@ function bindAudioEvents() {
 
 	const audio = getAudio()
 
-	audio.addEventListener('play', () => useMusicStore.setState({ isPlaying: true }))
-	audio.addEventListener('pause', () => useMusicStore.setState({ isPlaying: false }))
-	audio.addEventListener('timeupdate', () => useMusicStore.setState({ currentTime: audio.currentTime }))
-	audio.addEventListener('loadedmetadata', () => useMusicStore.setState({ duration: Number.isFinite(audio.duration) ? audio.duration : 0 }))
+	audio.addEventListener('play', () => {
+		useMusicStore.setState({ isPlaying: true, hasInteracted: true })
+		savePersistedState(true)
+	})
+	audio.addEventListener('pause', () => {
+		useMusicStore.setState({ isPlaying: false })
+		savePersistedState(true)
+	})
+	audio.addEventListener('timeupdate', () => {
+		useMusicStore.setState({ currentTime: audio.currentTime })
+		savePersistedState()
+	})
+	audio.addEventListener('loadedmetadata', () => {
+		const duration = Number.isFinite(audio.duration) ? audio.duration : 0
+		useMusicStore.setState({ duration })
+
+		if (pendingSeek !== null) {
+			const time = duration > 0 ? clamp(pendingSeek, 0, Math.max(0, duration - 0.5)) : 0
+			audio.currentTime = time
+			useMusicStore.setState({ currentTime: time })
+			pendingSeek = null
+			lastSavedAt = Date.now()
+		}
+	})
 	audio.addEventListener('durationchange', () => useMusicStore.setState({ duration: Number.isFinite(audio.duration) ? audio.duration : 0 }))
 	audio.addEventListener('volumechange', () => useMusicStore.setState({ volume: audio.volume, muted: audio.muted }))
 	audio.addEventListener('error', () => useMusicStore.setState({ isPlaying: false }))
@@ -99,6 +199,13 @@ function bindAudioEvents() {
 		}
 
 		useMusicStore.setState({ isPlaying: false })
+		savePersistedState(true)
+	})
+
+	// 关页/切后台时强制落盘，避免丢失最后几秒进度
+	window.addEventListener('pagehide', () => savePersistedState(true))
+	document.addEventListener('visibilitychange', () => {
+		if (document.visibilityState === 'hidden') savePersistedState(true)
 	})
 }
 
@@ -107,6 +214,7 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 	currentIndex: 0,
 	isPlaying: false,
 	isReady: false,
+	hasInteracted: false,
 	currentTime: 0,
 	duration: 0,
 	volume: 0.8,
@@ -119,24 +227,44 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 
 		const audio = getAudio()
 		bindAudioEvents()
-		audio.loop = get().repeat === 'one'
 
+		const { tracks } = get()
+		if (!tracks.length) return
+
+		const saved = readPersistedState()
+		const savedIndex = saved ? tracks.findIndex(track => track.id === saved.trackId) : -1
+
+		if (saved && savedIndex >= 0) {
+			audio.volume = saved.volume
+			audio.muted = saved.muted
+			audio.loop = saved.repeat === 'one'
+			audio.src = tracks[savedIndex].src
+			pendingSeek = saved.currentTime
+			lastSavedAt = Date.now()
+
+			set({
+				currentIndex: savedIndex,
+				isReady: true,
+				hasInteracted: true,
+				repeat: saved.repeat,
+				volume: saved.volume,
+				muted: saved.muted
+			})
+			return
+		}
+
+		// 没有有效存档：尝试迁移旧版音量设置，然后随机选曲
 		try {
-			const rawVolume = window.localStorage.getItem(VOLUME_STORAGE_KEY)
-			if (rawVolume !== null) {
-				const savedVolume = Number(rawVolume)
-				if (Number.isFinite(savedVolume) && savedVolume >= 0 && savedVolume <= 1) {
-					audio.volume = savedVolume
-				}
+			const legacyVolume = window.localStorage.getItem(LEGACY_VOLUME_KEY)
+			if (legacyVolume !== null && legacyVolume !== '') {
+				const volume = Number(legacyVolume)
+				if (Number.isFinite(volume) && volume >= 0 && volume <= 1) audio.volume = volume
 			}
 		} catch {
 			// localStorage 不可用时忽略
 		}
 
-		const { tracks } = get()
-		if (!tracks.length) return
-
-		// 初始曲目随机，且只在客户端执行，避免 SSR/CSR 水合不一致
+		audio.loop = get().repeat === 'one'
 		const index = Math.floor(Math.random() * tracks.length)
 		audio.src = tracks[index].src
 		set({ currentIndex: index, isReady: true, volume: audio.volume, muted: audio.muted })
@@ -155,10 +283,14 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 			set({ currentTime: 0, duration: 0 })
 		}
 
+		markInteracted()
 		safePlay()
 	},
 
-	pause: () => getAudio().pause(),
+	pause: () => {
+		markInteracted()
+		getAudio().pause()
+	},
 
 	toggle: () => {
 		if (get().isPlaying) get().pause()
@@ -183,30 +315,28 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 		const audio = getAudio()
 		if (!Number.isFinite(audio.duration)) return
 
-		const next = Math.max(0, Math.min(time, audio.duration))
+		pendingSeek = null
+		const next = clamp(time, 0, audio.duration)
 		audio.currentTime = next
-		set({ currentTime: next })
+		set({ currentTime: next, hasInteracted: true })
+		savePersistedState(true)
 	},
 
 	setVolume: (volume: number) => {
 		const audio = getAudio()
-		const next = Math.max(0, Math.min(volume, 1))
+		const next = clamp(volume, 0, 1)
 
 		audio.volume = next
 		if (next > 0) audio.muted = false
 		set({ volume: next, muted: audio.muted })
-
-		try {
-			window.localStorage.setItem(VOLUME_STORAGE_KEY, String(next))
-		} catch {
-			// localStorage 不可用时忽略
-		}
+		savePersistedState(true)
 	},
 
 	toggleMute: () => {
 		const audio = getAudio()
 		audio.muted = !audio.muted
 		set({ muted: audio.muted })
+		savePersistedState(true)
 	},
 
 	cycleRepeat: () => {
@@ -214,11 +344,12 @@ export const useMusicStore = create<MusicStore>((set, get) => ({
 		const next = order[(order.indexOf(get().repeat) + 1) % order.length]
 
 		getAudio().loop = next === 'one'
-		set({ repeat: next })
+		set({ repeat: next, hasInteracted: true })
+		savePersistedState(true)
 	}
 }))
 
-/** 在常驻布局中调用一次：选随机曲目、绑定 audio 事件 */
+/** 在常驻布局中调用一次：恢复/随机曲目、绑定 audio 事件 */
 export function useMusicInit() {
 	const init = useMusicStore(state => state.init)
 
