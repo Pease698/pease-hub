@@ -23,7 +23,7 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 | [snippets/](src/app/snippets/) | `/snippets` | 代码片段 | `src/app/snippets/list.json` |
 | [bloggers/](src/app/bloggers/) | `/bloggers` | 博主关注 | `src/app/bloggers/list.json` |
 | [about/](src/app/about/) | `/about` | 关于页 | `src/app/about/list.json` |
-| [music/](src/app/music/) | `/music` | 音乐播放器 | `src/app/music/list.ts` |
+| [music/](src/app/music/) | `/music` | 音乐播放器（播放列表、进度、音量） | `src/config/music.ts` |
 | [live2d/](src/app/live2d/) | `/live2d` | Live2D 看板娘 | 静态展示 |
 | [clock/](src/app/clock/) | `/clock` | 秒表/计时器 | 纯前端工具 |
 | [image-toolbox/](src/app/image-toolbox/) | `/image-toolbox` | 图片处理工具 | 纯前端工具 |
@@ -96,7 +96,7 @@ Next.js App Router 约定，每个子目录自动映射为一个 URL 路径。
 | `/snippets` | 代码片段 | 通过 blog 系统托管 |
 | `/bloggers` | 博主信息（名称、链接、头像、描述、标签） | `push-bloggers.ts` |
 | `/about` | Markdown 格式的关于内容 | `push-about.ts` |
-| `/music` | 音乐播放器（名称、iframe 嵌入） | — |
+| `/music` | 音乐播放器（曲目列表、进度、音量） | — |
 
 各 `list.json` 文件格式如下。
 
@@ -217,21 +217,33 @@ snippets 用更简单的方式存储，部分内容通过 blog 系统（`public/
 | `description` | string | 简短描述（SEO） |
 | `content` | string | 正文（Markdown 格式，`\n` 换行） |
 
-#### `/music` — `src/app/music/list.ts`
+#### `/music` — `src/config/music.ts`
+
+音乐数据集中在 `src/config/music.ts`：
 
 ```ts
-export const list = [
-  {
-    name: '歌曲名称',
-    iframe: '<iframe src="//player.bilibili.com/..." scrolling="no" ...></iframe>'
-  }
+export type MusicTrack = {
+  id: string
+  title: string
+  artist?: string
+  src: string
+  cover?: string
+}
+
+export const MUSIC_TRACKS: MusicTrack[] = [
+  { id: 'close-to-you', title: 'Close To You', artist: 'Carpenters', src: '/music/close-to-you.mp3' }
 ]
 ```
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
-| `name` | string | 歌曲名称 |
-| `iframe` | string | 嵌入播放器 HTML（支持 Bilibili、网易云等 iframe） |
+| `id` | string | 唯一标识 |
+| `title` | string | 歌曲名（界面显示；音频文件本身没有 ID3 title 标签） |
+| `artist` | string? | 歌手 |
+| `src` | string | 音频路径，文件放在 `public/music/` 下 |
+| `cover` | string? | 封面图（可选） |
+
+播放器由 `src/hooks/use-music.ts` 统一管理（全局唯一 `HTMLAudioElement`），首页悬浮卡 `src/components/music-card.tsx` 与 `/music` 页面 `src/app/music/page.tsx` 共用同一份播放状态。
 
 ---
 

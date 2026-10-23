@@ -1,18 +1,19 @@
 'use client'
 
-import { useState, useRef, useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Pause } from 'lucide-react'
+import clsx from 'clsx'
 import Card from '@/components/card'
+import MusicProgress from '@/components/music-progress'
 import { useCenterStore } from '@/hooks/use-center'
+import { useMusicStore } from '@/hooks/use-music'
 import { useConfigStore } from '../app/(home)/stores/config-store'
 import { CARD_SPACING } from '@/consts'
 import MusicSVG from '@/svgs/music.svg'
 import PlaySVG from '@/svgs/play.svg'
 import { HomeDraggableLayer } from '../app/(home)/home-draggable-layer'
-import { Pause } from 'lucide-react'
-import { usePathname } from 'next/navigation'
-import clsx from 'clsx'
-
-const MUSIC_FILES = ['/music/close-to-you.mp3']
 
 export default function MusicCard() {
 	const pathname = usePathname()
@@ -23,16 +24,17 @@ export default function MusicCard() {
 	const clockCardStyles = cardStyles.clockCard
 	const calendarCardStyles = cardStyles.calendarCard
 
-	const [isPlaying, setIsPlaying] = useState(false)
-	const [currentIndex, setCurrentIndex] = useState(0)
-	const [progress, setProgress] = useState(0)
-	const audioRef = useRef<HTMLAudioElement | null>(null)
-	const currentIndexRef = useRef(0)
+	const tracks = useMusicStore(state => state.tracks)
+	const currentIndex = useMusicStore(state => state.currentIndex)
+	const isPlaying = useMusicStore(state => state.isPlaying)
+	const isReady = useMusicStore(state => state.isReady)
+	const toggle = useMusicStore(state => state.toggle)
 
+	const track = tracks[currentIndex]
 	const isHomePage = pathname === '/'
 
 	const position = useMemo(() => {
-		// If not on home page, always position at bottom-right corner when playing
+		// 非首页时固定在视口右下角
 		if (!isHomePage) {
 			return {
 				x: center.width - styles.width - 16,
@@ -40,100 +42,20 @@ export default function MusicCard() {
 			}
 		}
 
-		// Default position on home page
+		// 首页默认位置
 		return {
 			x: styles.offsetX !== null ? center.x + styles.offsetX : center.x + CARD_SPACING + hiCardStyles.width / 2 - styles.offset,
 			y: styles.offsetY !== null ? center.y + styles.offsetY : center.y - clockCardStyles.offset + CARD_SPACING + calendarCardStyles.height + CARD_SPACING
 		}
-	}, [isPlaying, isHomePage, center, styles, hiCardStyles, clockCardStyles, calendarCardStyles])
+	}, [isHomePage, center, styles, hiCardStyles, clockCardStyles, calendarCardStyles])
 
 	const { x, y } = position
 
-	// Initialize audio element
-	useEffect(() => {
-		if (!audioRef.current) {
-			audioRef.current = new Audio()
-		}
+	// 音乐页自带完整播放器，不再显示悬浮卡
+	if (pathname === '/music') return null
 
-		const audio = audioRef.current
-
-		const updateProgress = () => {
-			if (audio.duration) {
-				setProgress((audio.currentTime / audio.duration) * 100)
-			}
-		}
-
-		const handleEnded = () => {
-			const nextIndex = (currentIndexRef.current + 1) % MUSIC_FILES.length
-			currentIndexRef.current = nextIndex
-			setCurrentIndex(nextIndex)
-			setProgress(0)
-		}
-
-		const handleTimeUpdate = () => {
-			updateProgress()
-		}
-
-		const handleLoadedMetadata = () => {
-			updateProgress()
-		}
-
-		audio.addEventListener('timeupdate', handleTimeUpdate)
-		audio.addEventListener('ended', handleEnded)
-		audio.addEventListener('loadedmetadata', handleLoadedMetadata)
-
-		return () => {
-			audio.removeEventListener('timeupdate', handleTimeUpdate)
-			audio.removeEventListener('ended', handleEnded)
-			audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
-		}
-	}, [])
-
-	// Handle currentIndex change - load new audio
-	useEffect(() => {
-		currentIndexRef.current = currentIndex
-		if (audioRef.current) {
-			const wasPlaying = !audioRef.current.paused
-			audioRef.current.pause()
-			audioRef.current.src = MUSIC_FILES[currentIndex]
-			audioRef.current.loop = false
-			setProgress(0)
-
-			if (wasPlaying) {
-				audioRef.current.play().catch(console.error)
-			}
-		}
-	}, [currentIndex])
-
-	// Handle play/pause state change
-	useEffect(() => {
-		if (!audioRef.current) return
-
-		if (isPlaying) {
-			audioRef.current.play().catch(console.error)
-		} else {
-			audioRef.current.pause()
-		}
-	}, [isPlaying])
-
-	// Cleanup on unmount
-	useEffect(() => {
-		return () => {
-			if (audioRef.current) {
-				audioRef.current.pause()
-				audioRef.current.src = ''
-			}
-		}
-	}, [])
-
-	const togglePlayPause = () => {
-		setIsPlaying(!isPlaying)
-	}
-
-	// Hide component if not on home page and not playing
-	if (!isHomePage && !isPlaying) {
-		return null
-	}
+	// 非首页且未播放时隐藏
+	if (!isHomePage && !isPlaying) return null
 
 	return (
 		<HomeDraggableLayer cardKey='musicCard' x={x} y={y} width={styles.width} height={styles.height}>
@@ -155,17 +77,28 @@ export default function MusicCard() {
 					</>
 				)}
 
-				<MusicSVG className='h-8 w-8' />
+				<Link href='/music' aria-label='打开音乐页面' className='shrink-0'>
+					<MusicSVG className='h-8 w-8' />
+				</Link>
 
-				<div className='flex-1'>
-					<div className='text-secondary text-sm'>Close To You</div>
+				<div className='min-w-0 flex-1'>
+					<Link
+						href='/music'
+						title={isReady && track ? `${track.title}${track.artist ? ` - ${track.artist}` : ''}` : undefined}
+						className='text-secondary hover:text-primary block truncate text-sm transition-colors'>
+						{isReady && track ? track.title : '—'}
+					</Link>
 
-					<div className='mt-1 h-2 rounded-full bg-white/60'>
-						<div className='bg-linear h-full rounded-full transition-all duration-300' style={{ width: `${progress}%` }} />
+					<div className='mt-1'>
+						<MusicProgress compact />
 					</div>
 				</div>
 
-				<button onClick={togglePlayPause} className='flex h-10 w-10 items-center justify-center rounded-full bg-white transition-opacity hover:opacity-80'>
+				<button
+					type='button'
+					onClick={toggle}
+					aria-label={isPlaying ? '暂停' : '播放'}
+					className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white transition-opacity hover:opacity-80'>
 					{isPlaying ? <Pause className='text-brand h-4 w-4' /> : <PlaySVG className='text-brand ml-1 h-4 w-4' />}
 				</button>
 			</Card>
