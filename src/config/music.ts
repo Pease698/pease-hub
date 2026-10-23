@@ -21,6 +21,12 @@ export const MUSIC_TRACKS: MusicTrack[] = [
 	{
 		id: 'christmas',
 		title: 'Christmas',
-		src: '/music/christmas.m4a'
+		src: '/music/christmas.mp3'
+	},
+	{
+		id: 'Merry-Christmas-Mr_Lawrence',
+		title: 'Merry Christmas Mr.Lawrence',
+		artist: '坂本龙一 / Jaques Morelenbaum / Judy Kang',
+		src: '/music/Merry-Christmas-Mr_Lawrence.mp3'
 	}
 ]
